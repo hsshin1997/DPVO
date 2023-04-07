@@ -159,23 +159,29 @@ class DPVO:
 
     def terminate(self):
         """ interpolate missing poses """
+        print("1")
         self.traj = {}
+        print("2")
         for i in range(self.n):
             self.traj[self.tstamps_[i].item()] = self.poses_[i]
-
+        print("3")
         poses = [self.get_pose(t) for t in range(self.counter)]
+        print("4")
         poses = lietorch.stack(poses, dim=0)
+        print("5")
         poses = poses.inv().data.cpu().numpy()
+        print("6")
         tstamps = np.array(self.tlist, dtype=np.float)
-
+        
         if self.viewer is not None:
+            print("7")
             self.viewer.join()
-        print("poses: line 173 of dpvo.py")
+        print("poses: line 179 of dpvo.py")
         print(poses)
 
-        print("tstamps: line176 of dpvo.py")
+        print("tstamps: line182 of dpvo.py")
         print(tstamps)
-        
+
         return poses, tstamps
 
     def corr(self, coords, indicies=None):
