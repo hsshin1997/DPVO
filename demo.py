@@ -41,13 +41,12 @@ def run(cfg, network, imagedir, calib, stride=1, skip=0, viz=False, timeit=False
         image = torch.from_numpy(image).permute(2,0,1).cuda()
         intrinsics = torch.from_numpy(intrinsics).cuda()
 
-        print("2. calling DPVO: (line 44 of demo.py)")
         if slam is None:
             slam = DPVO(cfg, network, ht=image.shape[1], wd=image.shape[2], viz=viz)
 
         image = image.cuda()
         intrinsics = intrinsics.cuda()
-        
+
         with Timer("SLAM", enabled=timeit):
             slam(t, image, intrinsics)
 
@@ -90,7 +89,6 @@ if __name__ == '__main__':
     print("Running with config...")
     print(cfg)
 
-    print("1. calling run: (line 92 of demo.py)")
     pred_traj = run(cfg, args.network, args.imagedir, args.calib, args.stride, args.skip, args.viz, args.timeit, args.save_reconstruction)
     name = Path(args.imagedir).stem
 
