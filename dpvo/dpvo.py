@@ -170,7 +170,12 @@ class DPVO:
 
         if self.viewer is not None:
             self.viewer.join()
+        print("poses: line 173 of dpvo.py")
+        print(poses)
 
+        print("tstamps: line176 of dpvo.py")
+        print(tstamps)
+        
         return poses, tstamps
 
     def corr(self, coords, indicies=None):
