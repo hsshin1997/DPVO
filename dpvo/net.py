@@ -149,6 +149,7 @@ class Patchifier(nn.Module):
         index = index.repeat(1, patches_per_image).reshape(-1)
         print("index: line 150 at net.py")
         print(index)
+        
         if return_color:
             return fmap, gmap, imap, patches, index, clr
 
@@ -190,10 +191,12 @@ class VONet(nn.Module):
         intrinsics = intrinsics / 4.0
         disps = disps[:, :, 1::4, 1::4].float()
 
+        # Add loop to create 3 patches. Then use the best patch using RANSAC
         fmap, gmap, imap, patches, ix = self.patchify(images, disps=disps)
 
         corr_fn = CorrBlock(fmap, gmap)
-
+        print("corr_fn: line 198 of net.py")
+        print(corr_fn)
         b, N, c, h, w = fmap.shape
         p = self.P
 
