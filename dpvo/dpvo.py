@@ -373,7 +373,11 @@ class DPVO:
             s = torch.median(self.patches_[self.n-3:self.n,:,2])
             patches[:,:,2] = s
 
+        print("patches: line 376 of dpvo.py")
+        print(patches)
+        print(patches.size())
         self.patches_[self.n] = patches
+
 
         ### update network attributes ###
         self.imap_[self.n % self.mem] = imap.squeeze()
