@@ -377,6 +377,7 @@ class DPVO:
         print(patches)
         print(patches.size())
         print(self.patches_[self.n].size())
+        print(self.patches_.size())
         self.patches_[self.n] = patches
 
 
