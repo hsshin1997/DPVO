@@ -115,7 +115,7 @@ class DPVO:
 
 
     def start_viewer(self):
-        from dpviewerx import Viewer
+        from DPViewer.dpviewerx import Viewer
 
         intrinsics_ = torch.zeros(1, 4, dtype=torch.float32, device="cuda")
 
