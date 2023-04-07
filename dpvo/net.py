@@ -132,14 +132,16 @@ class Patchifier(nn.Module):
             x = torch.randint(1, w-1, size=[n, patches_per_image], device="cuda")
             y = torch.randint(1, h-1, size=[n, patches_per_image], device="cuda")
         
-        print("size of x: (line 135 of net.py)")
-        print(x)
-        print("size of y: (line 135 of net.py)")
-        print(y)
-        
         coords = torch.stack([x, y], dim=-1).float()
         imap = altcorr.patchify(imap[0], coords, 0).view(b, -1, DIM, 1, 1)
         gmap = altcorr.patchify(fmap[0], coords, P//2).view(b, -1, 128, P, P)
+
+        print("coords: (line 139 of net.py)")
+        print(coords)
+        print("imap: ")
+        print(imap)
+        print("gmap: ")
+        print(gmap)
 
         if return_color:
             clr = altcorr.patchify(images[0], 4*(coords + 0.5), 0).view(b, -1, 3)
@@ -153,7 +155,7 @@ class Patchifier(nn.Module):
         index = torch.arange(n, device="cuda").view(n, 1)
         index = index.repeat(1, patches_per_image).reshape(-1)
 
-        print("index: (line 156 of net.py)")
+        print("index: (line 158 of net.py)")
         print(index)
 
         if return_color:
