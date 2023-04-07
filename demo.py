@@ -90,7 +90,7 @@ if __name__ == '__main__':
     print(cfg)
     
     pred_traj = run(cfg, args.network, args.imagedir, args.calib, args.stride, args.skip, args.viz, args.timeit, True)
-    pred_traj = run(cfg, args.network, args.imagedir, args.calib, args.stride, args.skip, args.viz, args.timeit, args.save_reconstruction)
+    # pred_traj = run(cfg, args.network, args.imagedir, args.calib, args.stride, args.skip, args.viz, args.timeit, args.save_reconstruction)
     name = Path(args.imagedir).stem
 
     if args.save_reconstruction:
