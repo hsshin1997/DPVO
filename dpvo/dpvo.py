@@ -118,7 +118,6 @@ class DPVO:
         from dpviewer import Viewer
 
         intrinsics_ = torch.zeros(1, 4, dtype=torch.float32, device="cuda")
-        print("starting viewer")
         self.viewer = Viewer(
             self.image_,
             self.poses_,
