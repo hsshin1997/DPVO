@@ -136,13 +136,6 @@ class Patchifier(nn.Module):
         imap = altcorr.patchify(imap[0], coords, 0).view(b, -1, DIM, 1, 1)
         gmap = altcorr.patchify(fmap[0], coords, P//2).view(b, -1, 128, P, P)
 
-        # print("coords: (line 139 of net.py)")
-        # # print(coords)
-        # print("imap: (line 141 of net.py)")
-        # print(imap.size())
-        # print("gmap: ")
-        # print(gmap.size())
-
         if return_color:
             clr = altcorr.patchify(images[0], 4*(coords + 0.5), 0).view(b, -1, 3)
 
@@ -151,14 +144,9 @@ class Patchifier(nn.Module):
 
         grid, _ = coords_grid_with_index(disps, device=fmap.device)
         patches = altcorr.patchify(grid[0], coords, P//2).view(b, -1, 3, P, P)
-        # print("patches: (line 154 net.py) ")
-        # print(patches)
 
         index = torch.arange(n, device="cuda").view(n, 1)
         index = index.repeat(1, patches_per_image).reshape(-1)
-
-        # print("index: (line 160 of net.py)")
-        # print(index)
 
         if return_color:
             return fmap, gmap, imap, patches, index, clr

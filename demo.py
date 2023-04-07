@@ -88,7 +88,7 @@ if __name__ == '__main__':
 
     print("Running with config...")
     print(cfg)
-    
+
     pred_traj = run(cfg, args.network, args.imagedir, args.calib, args.stride, args.skip, args.viz, args.timeit, args.save_reconstruction)
     name = Path(args.imagedir).stem
 
