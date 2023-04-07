@@ -151,14 +151,14 @@ class Patchifier(nn.Module):
 
         grid, _ = coords_grid_with_index(disps, device=fmap.device)
         patches = altcorr.patchify(grid[0], coords, P//2).view(b, -1, 3, P, P)
-        print("patches: (line 154 net.py) ")
-        print(patches)
+        # print("patches: (line 154 net.py) ")
+        # print(patches)
 
         index = torch.arange(n, device="cuda").view(n, 1)
         index = index.repeat(1, patches_per_image).reshape(-1)
 
-        print("index: (line 160 of net.py)")
-        print(index)
+        # print("index: (line 160 of net.py)")
+        # print(index)
 
         if return_color:
             return fmap, gmap, imap, patches, index, clr
