@@ -90,8 +90,9 @@ if __name__ == '__main__':
     print(cfg)
 
     pred_traj = run(cfg, args.network, args.imagedir, args.calib, args.stride, args.skip, args.viz, args.timeit, args.save_reconstruction)
+    print("DONE 1")
     name = Path(args.imagedir).stem
-
+    print("DONE 2")
     if args.save_reconstruction:
         pred_traj, ply_data = pred_traj
         ply_data.write(f"{name}.ply")
@@ -105,7 +106,7 @@ if __name__ == '__main__':
         Path("trajectory_plots").mkdir(exist_ok=True)
         plot_trajectory(pred_traj, title=f"DPVO Trajectory Prediction for {name}", filename=f"trajectory_plots/{name}.pdf")
     
-    print("DONE")
+    print("DONE 3")
 
 
         
