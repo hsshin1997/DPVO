@@ -140,8 +140,8 @@ class Patchifier(nn.Module):
         # print(coords)
         print("imap: (line 141 of net.py)")
         print(imap)
-        print("gmap: ")
-        print(gmap)
+        # print("gmap: ")
+        # print(gmap)
 
         if return_color:
             clr = altcorr.patchify(images[0], 4*(coords + 0.5), 0).view(b, -1, 3)
