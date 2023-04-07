@@ -104,6 +104,8 @@ if __name__ == '__main__':
     if args.plot:
         Path("trajectory_plots").mkdir(exist_ok=True)
         plot_trajectory(pred_traj, title=f"DPVO Trajectory Prediction for {name}", filename=f"trajectory_plots/{name}.pdf")
+    
+    print("DONE")
 
 
         
