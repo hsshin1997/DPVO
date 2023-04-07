@@ -115,7 +115,7 @@ class DPVO:
 
 
     def start_viewer(self):
-        from dpviewer import Viewer
+        from DPViewer.dpviewer import Viewer
 
         intrinsics_ = torch.zeros(1, 4, dtype=torch.float32, device="cuda")
 
@@ -178,11 +178,8 @@ class DPVO:
             self.viewer.join()
         
         print("poses: line 179 of dpvo.py")
-
         print(poses)
-
         print("tstamps: line182 of dpvo.py")
-        
         print(tstamps)
 
         return poses, tstamps
