@@ -54,7 +54,7 @@ def run(cfg, network, imagedir, calib, stride=1, skip=0, viz=False, timeit=False
         slam.update()
 
     reader.join()
-
+    print("Done multiprocessing")
     if save_reconstruction:
         points = slam.points_.cpu().numpy()[:slam.m]
         colors = slam.colors_.view(-1, 3).cpu().numpy()[:slam.m]
