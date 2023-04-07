@@ -176,10 +176,13 @@ class DPVO:
         if self.viewer is not None:
             print("7")
             self.viewer.join()
+        
         print("poses: line 179 of dpvo.py")
+
         print(poses)
 
         print("tstamps: line182 of dpvo.py")
+        
         print(tstamps)
 
         return poses, tstamps
