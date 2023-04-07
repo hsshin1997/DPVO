@@ -147,8 +147,8 @@ class Patchifier(nn.Module):
 
         index = torch.arange(n, device="cuda").view(n, 1)
         index = index.repeat(1, patches_per_image).reshape(-1)
-        print("index: line 150 at net.py")
-        print(index)
+        # print("index: line 150 at net.py")
+        # print(index)
         
         if return_color:
             return fmap, gmap, imap, patches, index, clr
