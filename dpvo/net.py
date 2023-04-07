@@ -136,12 +136,12 @@ class Patchifier(nn.Module):
         imap = altcorr.patchify(imap[0], coords, 0).view(b, -1, DIM, 1, 1)
         gmap = altcorr.patchify(fmap[0], coords, P//2).view(b, -1, 128, P, P)
 
-        print("coords: (line 139 of net.py)")
-        print(coords)
-        # print("imap: ")
-        # print(imap)
-        # print("gmap: ")
-        # print(gmap)
+        # print("coords: (line 139 of net.py)")
+        # print(coords)
+        print("imap: (line 141 of net.py)")
+        print(imap)
+        print("gmap: ")
+        print(gmap)
 
         if return_color:
             clr = altcorr.patchify(images[0], 4*(coords + 0.5), 0).view(b, -1, 3)
