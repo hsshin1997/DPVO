@@ -369,9 +369,13 @@ class DPVO:
 
         # TODO better depth initialization
         patches[:,:,2] = torch.rand_like(patches[:,:,2,0,0,None,None])
+        print("patches[:,:,2] = torch.rand_like(patches[:,:,2,0,0,None,None])")
+        print(patches[:,:,2])
         if self.is_initialized:
             s = torch.median(self.patches_[self.n-3:self.n,:,2])
             patches[:,:,2] = s
+            print("torch.median(self.patches_[self.n-3:self.n,:,2])")
+            print(s)
 
         print("patches: line 376 of dpvo.py")
         print(patches)
