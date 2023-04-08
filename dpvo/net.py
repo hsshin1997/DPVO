@@ -195,8 +195,7 @@ class VONet(nn.Module):
         fmap, gmap, imap, patches, ix = self.patchify(images, disps=disps)
 
         corr_fn = CorrBlock(fmap, gmap)
-        print("corr_fn: line 198 of net.py")
-        print(corr_fn)
+ 
         b, N, c, h, w = fmap.shape
         p = self.P
 
