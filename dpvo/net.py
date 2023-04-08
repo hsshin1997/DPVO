@@ -28,7 +28,7 @@ from skimage.measure import ransac
 def select_patches_ransac(coords, num_inliers, min_samples, max_trials, residual_threshold):
     coords_np = coords.cpu().numpy()
     model, inliers = ransac(coords_np, # data
-                             # Add the appropriate model class here, e.g., LineModelND, CircleModel
+                             LineModelND, # Add the appropriate model class here, e.g., LineModelND, CircleModel
                              min_samples=min_samples,
                              residual_threshold=residual_threshold,
                              max_trials=max_trials)
@@ -150,7 +150,7 @@ class Patchifier(nn.Module):
             y = torch.randint(1, h-1, size=[n, patches_per_image], device="cuda")
         
         # coords = torch.stack([x, y], dim=-1).float()
-        # ======
+        # ========================================================================
         coords = torch.stack([x, y], dim=-1).float()
         selected_coords = []
         for i in range(n):
@@ -161,7 +161,7 @@ class Patchifier(nn.Module):
                                             residual_threshold=5.0)
             selected_coords.append(inliers)
         coords = torch.stack(selected_coords, dim=0)
-        # ======
+        # ========================================================================
         imap = altcorr.patchify(imap[0], coords, 0).view(b, -1, DIM, 1, 1)
         gmap = altcorr.patchify(fmap[0], coords, P//2).view(b, -1, 128, P, P)
 
