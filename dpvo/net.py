@@ -134,6 +134,7 @@ class Patchifier(nn.Module):
 
         # bias patch selection towards regions with high gradient
         if gradient_bias:
+            print("in gradient bias")
             g = self.__image_gradient(images)
             x = torch.randint(1, w-1, size=[n, 3*patches_per_image], device="cuda")
             y = torch.randint(1, h-1, size=[n, 3*patches_per_image], device="cuda")
