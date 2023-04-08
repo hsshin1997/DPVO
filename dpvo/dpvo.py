@@ -290,7 +290,8 @@ class DPVO:
             lmbda = torch.as_tensor([1e-4], device="cuda")
             weight = weight.float()
             target = coords[...,self.P//2,self.P//2] + delta.float()
-
+        print("self.P//2")
+        print(self.P//2)
         print("corr at line 294 of dpvo.py")
         print(corr.size())
         with Timer("BA", enabled=self.enable_timing):
