@@ -293,7 +293,7 @@ class DPVO:
 
         print("corr at line 294 of dpvo.py")
         print(corr.size())
-        print(coords[1,1,:,:,:])
+        print(coords[0,0,:,:,:])
         with Timer("BA", enabled=self.enable_timing):
             t0 = self.n - self.cfg.OPTIMIZATION_WINDOW if self.is_initialized else 1
             t0 = max(t0, 1)
