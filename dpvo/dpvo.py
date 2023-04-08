@@ -310,8 +310,8 @@ class DPVO:
             points = (points[...,1,1,:3] / points[...,1,1,3:]).reshape(-1, 3)
             self.points_[:len(points)] = points[:]
 
-        print("weight: line 313 of dpvo.py")
-        print(weight.size())
+        # print("weight: line 313 of dpvo.py")
+        # print(weight.size())
                 
     def __edges_all(self):
         return flatmeshgrid(
