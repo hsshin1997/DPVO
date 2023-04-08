@@ -118,6 +118,7 @@ class DPVO:
         from dpviewer import Viewer
 
         intrinsics_ = torch.zeros(1, 4, dtype=torch.float32, device="cuda")
+
         self.viewer = Viewer(
             self.image_,
             self.poses_,
@@ -158,28 +159,17 @@ class DPVO:
 
     def terminate(self):
         """ interpolate missing poses """
-        print("1")
         self.traj = {}
-        print("2")
         for i in range(self.n):
             self.traj[self.tstamps_[i].item()] = self.poses_[i]
-        print("3")
+
         poses = [self.get_pose(t) for t in range(self.counter)]
-        print("4")
         poses = lietorch.stack(poses, dim=0)
-        print("5")
         poses = poses.inv().data.cpu().numpy()
-        print("6")
         tstamps = np.array(self.tlist, dtype=np.float)
-        
+
         if self.viewer is not None:
-            print("7")
             self.viewer.join()
-        
-        print("poses: line 179 of dpvo.py")
-        print(poses)
-        print("tstamps: line182 of dpvo.py")
-        print(tstamps)
 
         return poses, tstamps
 
@@ -279,7 +269,7 @@ class DPVO:
 
     def update(self):
         with Timer("other", enabled=self.enable_timing):
-            coords = self.reproject() # eq 2. This gives patches in frame k
+            coords = self.reproject()
 
             with autocast(enabled=True):
                 corr = self.corr(coords)
@@ -291,11 +281,6 @@ class DPVO:
             weight = weight.float()
             target = coords[...,self.P//2,self.P//2] + delta.float()
 
-        # print("corr: at line 294 of dpvo.py")
-        # print(corr[0, 0])
-        # print(coords.size())
-        # print()
-        # print(coords[0,0,:,:,:])
         with Timer("BA", enabled=self.enable_timing):
             t0 = self.n - self.cfg.OPTIMIZATION_WINDOW if self.is_initialized else 1
             t0 = max(t0, 1)
@@ -309,9 +294,6 @@ class DPVO:
             points = pops.point_cloud(SE3(self.poses), self.patches[:, :self.m], self.intrinsics, self.ix[:self.m])
             points = (points[...,1,1,:3] / points[...,1,1,3:]).reshape(-1, 3)
             self.points_[:len(points)] = points[:]
-
-        # print("weight: line 313 of dpvo.py")
-        # print(weight.size())
                 
     def __edges_all(self):
         return flatmeshgrid(
@@ -381,13 +363,7 @@ class DPVO:
             s = torch.median(self.patches_[self.n-3:self.n,:,2])
             patches[:,:,2] = s
 
-        # print("patches: line 376 of dpvo.py")
-        # print(patches)
-        # print(patches.size())
-        # print(self.patches_[self.n].size())
-        # print(self.patches_.size())
         self.patches_[self.n] = patches
-
 
         ### update network attributes ###
         self.imap_[self.n % self.mem] = imap.squeeze()
@@ -419,7 +395,6 @@ class DPVO:
             self.keyframe()
 
             
-
 
 
 
