@@ -279,7 +279,7 @@ class DPVO:
 
     def update(self):
         with Timer("other", enabled=self.enable_timing):
-            coords = self.reproject() # eq 2
+            coords = self.reproject() # eq 2. This gives patches in frame k
 
             with autocast(enabled=True):
                 corr = self.corr(coords)
@@ -292,7 +292,7 @@ class DPVO:
             target = coords[...,self.P//2,self.P//2] + delta.float()
 
         print("corr at line 294 of dpvo.py")
-        print(corr.size())
+        print(self.patches_.size())
         print(coords.size())
         # print(coords[0,0,:,:,:])
         with Timer("BA", enabled=self.enable_timing):
