@@ -374,8 +374,9 @@ class DPVO:
         if self.is_initialized:
             s = torch.median(self.patches_[self.n-3:self.n,:,2])
             patches[:,:,2] = s
-            print("self.patches_[self.n-3:self.n,:,2]")
-            print(self.patches_[self.n-3:self.n,:,1].size())
+            print(patches[:,:,2])
+            print("patches[:,:,2].size()")
+            print(patches[:,:,2].size())
             print("torch.median(self.patches_[self.n-3:self.n,:,2])")
             print(s)
 
