@@ -295,9 +295,17 @@ class DPVO:
             points = (points[...,1,1,:3] / points[...,1,1,3:]).reshape(-1, 3)
             self.points_[:len(points)] = points[:]
         
-        print("weight: line 297 of dpvo.py")
-        print(weight.size())
+        print("self.intrinsics: line 297 of dpvo.py")
+        print(self.intrinsics.size())
         print()
+        print("self.ii: line 297 of dpvo.py")
+        print(self.ii.size())
+        print()
+        print("self.jj: line 297 of dpvo.py")
+        print(self.jj.size())
+        print()
+        print("self.kk: line 297 of dpvo.py")
+        print(self.kk.size())
                 
     def __edges_all(self):
         return flatmeshgrid(
