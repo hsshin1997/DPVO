@@ -303,7 +303,8 @@ class DPVO:
         print(self.jj.size())
         print("self.kk: line 297 of dpvo.py")
         print(self.kk.size())
-        print("t0: " + t0)
+        print("t0: ")
+        print(t0)
         print()
                 
     def __edges_all(self):
