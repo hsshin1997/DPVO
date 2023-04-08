@@ -149,7 +149,19 @@ class Patchifier(nn.Module):
             x = torch.randint(1, w-1, size=[n, patches_per_image], device="cuda")
             y = torch.randint(1, h-1, size=[n, patches_per_image], device="cuda")
         
+        # coords = torch.stack([x, y], dim=-1).float()
+        # ======
         coords = torch.stack([x, y], dim=-1).float()
+        selected_coords = []
+        for i in range(n):
+            inliers = select_patches_ransac(coords[i],
+                                            num_inliers=patches_per_image,
+                                            min_samples=2, 
+                                            max_trials=100,
+                                            residual_threshold=5.0)
+            selected_coords.append(inliers)
+        coords = torch.stack(selected_coords, dim=0)
+        # ======
         imap = altcorr.patchify(imap[0], coords, 0).view(b, -1, DIM, 1, 1)
         gmap = altcorr.patchify(fmap[0], coords, P//2).view(b, -1, 128, P, P)
 
