@@ -24,7 +24,7 @@ import matplotlib.pyplot as plt
 
 DIM = 384
 
-from skimage.measure import ransac
+from skimage.measure import ransac, LineModelND
 def select_patches_ransac(coords, num_inliers, min_samples, max_trials, residual_threshold):
     coords_np = coords.cpu().numpy()
     model, inliers = ransac(coords_np, # data
