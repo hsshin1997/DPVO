@@ -294,6 +294,7 @@ class DPVO:
             points = pops.point_cloud(SE3(self.poses), self.patches[:, :self.m], self.intrinsics, self.ix[:self.m])
             points = (points[...,1,1,:3] / points[...,1,1,3:]).reshape(-1, 3)
             self.points_[:len(points)] = points[:]
+        
         print("weight: line 297 of dpvo.py")
         print(weight.size())
         print()
