@@ -378,7 +378,7 @@ class DPVO:
             print("patches[:,:,2].size()")
             print(patches[:,:,2].size())
             print("torch.median(self.patches_[self.n-3:self.n,:,2])")
-            print(s)
+            print(s.size())
 
         print("patches: line 376 of dpvo.py")
         # print(patches)
