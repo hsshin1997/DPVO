@@ -291,10 +291,10 @@ class DPVO:
             weight = weight.float()
             target = coords[...,self.P//2,self.P//2] + delta.float()
 
-        print("corr: at line 294 of dpvo.py")
-        print(corr[0, 0])
-        print(coords.size())
-        print()
+        # print("corr: at line 294 of dpvo.py")
+        # print(corr[0, 0])
+        # print(coords.size())
+        # print()
         # print(coords[0,0,:,:,:])
         with Timer("BA", enabled=self.enable_timing):
             t0 = self.n - self.cfg.OPTIMIZATION_WINDOW if self.is_initialized else 1
