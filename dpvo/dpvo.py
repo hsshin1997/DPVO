@@ -297,15 +297,14 @@ class DPVO:
         
         print("self.intrinsics: line 297 of dpvo.py")
         print(self.intrinsics.size())
-        print()
         print("self.ii: line 297 of dpvo.py")
         print(self.ii.size())
-        print()
         print("self.jj: line 297 of dpvo.py")
         print(self.jj.size())
-        print()
         print("self.kk: line 297 of dpvo.py")
         print(self.kk.size())
+        print("t0: " + t0)
+        print()
                 
     def __edges_all(self):
         return flatmeshgrid(
