@@ -24,6 +24,23 @@ import matplotlib.pyplot as plt
 
 DIM = 384
 
+from skimage.measure import ransac
+def select_patches_ransac(coords, num_inliers, min_samples, max_trials, residual_threshold):
+    coords_np = coords.cpu().numpy()
+    model, inliers = ransac(coords_np, # data
+                             # Add the appropriate model class here, e.g., LineModelND, CircleModel
+                             min_samples=min_samples,
+                             residual_threshold=residual_threshold,
+                             max_trials=max_trials)
+
+    selected_coords = coords[inliers]
+    while selected_coords.shape[0] < num_inliers:
+        idx = np.random.choice(coords.shape[0], num_inliers - selected_coords.shape[0])
+        extra_coords = coords[idx]
+        selected_coords = torch.cat([selected_coords, extra_coords], axis=0)
+
+    return selected_coords
+
 class Update(nn.Module):
     def __init__(self, p):
         super(Update, self).__init__()
