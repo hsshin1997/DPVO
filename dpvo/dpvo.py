@@ -304,8 +304,10 @@ class DPVO:
         print(self.poses.size())
         print("Patches: ")
         print(self.patches.size())
+        print(self.patches[0,1,0:2,0,0])
         print("delta: ")
         print(delta.size())
+        print(delta[0,1])
         print()
                 
     def __edges_all(self):
