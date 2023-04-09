@@ -347,7 +347,7 @@ class DPVO:
             patches1[:,:,2] = s
 
         (ii, jj, kk) = (self.ii, self.jj, self.kk)
-        coords = pops.transform(SE3(self.poses), patches1, self.intrinsics, ii, jj, kk)
+        coords1 = pops.transform(SE3(self.poses), patches1, self.intrinsics, ii, jj, kk)
 
         # patch 2
         with autocast(enabled=self.cfg.MIXED_PRECISION):
