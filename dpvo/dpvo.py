@@ -294,30 +294,30 @@ class DPVO:
             points = (points[...,1,1,:3] / points[...,1,1,3:]).reshape(-1, 3)
             self.points_[:len(points)] = points[:]
         
-        print("self.ii")
-        print(self.ii[-1])
-        print("coords: (line 297 of dpvo.py)")
-        print(coords.size())
-        print(coords[0, 1,:,0,0])
-        print("Poses:  line 298 of dpvo.py")
-        print(self.poses.size())
-        print("Patches: ")
-        print(self.patches.size())
-        print(self.patches[0,1,0:2,0,0])
-        print("delta: ")
-        print(delta.size())
-        print(delta[0,1])
-        print()
+        # print("self.ii")
+        # print(self.ii[-1])
+        # print("coords: (line 297 of dpvo.py)")
+        # print(coords.size())
+        # print(coords[0, 1,:,0,0])
+        # print("Poses:  line 298 of dpvo.py")
+        # print(self.poses.size())
+        # print("Patches: ")
+        # print(self.patches.size())
+        # print(self.patches[0,1,0:2,0,0])
+        # print("delta: ")
+        # print(delta.size())
+        # print(delta[0,1])
+        # print()
 
-        # cost = 0
-        # for i in range(self.ii.numel()):
-        #     delta_ij = delta[0, i]
-        #     for j in range(3):
-        #         for k in range(3):
-        #             w_ij = coords[0, i, :, j, k]
-        #             x_hat_ij = self.patches[0, i, 0:2, j, k]
-        #             cost += torch.norm(w_ij.sub((x_hat_ij).add(delta_ij)))**2                    
-                    
+        cost = 0
+        for i in self.ii[-1]:
+            delta_ij = delta[0, i]
+            for j in range(3):
+                for k in range(3):
+                    w_ij = coords[0, i, :, j, k]
+                    x_hat_ij = self.patches[0, i, 0:2, j, k]
+                    cost += torch.norm(w_ij.sub((x_hat_ij).add(delta_ij)))**2                    
+        print("cost is: " + cost)
 
 
                 
