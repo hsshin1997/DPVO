@@ -390,26 +390,26 @@ class DPVO:
                     gradient_bias=self.cfg.GRADIENT_BIAS, 
                     return_color=True)
             
-        with autocast(enabled=self.cfg.MIXED_PRECISION):
-            fmap1, gmap1, imap1, patches1, _, clr1 = \
-                self.network.patchify(image,
-                    patches_per_image=self.cfg.PATCHES_PER_FRAME, 
-                    gradient_bias=self.cfg.GRADIENT_BIAS, 
-                    return_color=True)
+        # with autocast(enabled=self.cfg.MIXED_PRECISION):
+        #     fmap1, gmap1, imap1, patches1, _, clr1 = \
+        #         self.network.patchify(image,
+        #             patches_per_image=self.cfg.PATCHES_PER_FRAME, 
+        #             gradient_bias=self.cfg.GRADIENT_BIAS, 
+        #             return_color=True)
         
-        with autocast(enabled=self.cfg.MIXED_PRECISION):
-            fmap2, gmap2, imap2, patches2, _, clr2 = \
-                self.network.patchify(image,
-                    patches_per_image=self.cfg.PATCHES_PER_FRAME, 
-                    gradient_bias=self.cfg.GRADIENT_BIAS, 
-                    return_color=True)
+        # with autocast(enabled=self.cfg.MIXED_PRECISION):
+        #     fmap2, gmap2, imap2, patches2, _, clr2 = \
+        #         self.network.patchify(image,
+        #             patches_per_image=self.cfg.PATCHES_PER_FRAME, 
+        #             gradient_bias=self.cfg.GRADIENT_BIAS, 
+        #             return_color=True)
             
-        with autocast(enabled=self.cfg.MIXED_PRECISION):
-            fmap3, gmap3, imap3, patches3, _, clr3 = \
-                self.network.patchify(image,
-                    patches_per_image=self.cfg.PATCHES_PER_FRAME, 
-                    gradient_bias=self.cfg.GRADIENT_BIAS, 
-                    return_color=True)
+        # with autocast(enabled=self.cfg.MIXED_PRECISION):
+        #     fmap3, gmap3, imap3, patches3, _, clr3 = \
+        #         self.network.patchify(image,
+        #             patches_per_image=self.cfg.PATCHES_PER_FRAME, 
+        #             gradient_bias=self.cfg.GRADIENT_BIAS, 
+        #             return_color=True)
 
         ### update state attributes ###
         self.tlist.append(tstamp)
