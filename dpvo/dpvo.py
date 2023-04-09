@@ -445,30 +445,30 @@ class DPVO:
                 self.poses_[self.n] = tvec_qvec
 
         # # TODO better depth initialization
-        # patches[:,:,2] = torch.rand_like(patches1[:,:,2,0,0,None,None])
+        patches[:,:,2] = torch.rand_like(patches1[:,:,2,0,0,None,None])
+        if self.is_initialized:
+            s = torch.median(self.patches_[self.n-3:self.n,:,2])
+            patches[:,:,2] = s
+
+        self.patches_[self.n] = patches
+
+        # TODO better depth initialization
+        # patches1[:,:,2] = torch.rand_like(patches1[:,:,2,0,0,None,None])
         # if self.is_initialized:
         #     s = torch.median(self.patches_[self.n-3:self.n,:,2])
-        #     patches[:,:,2] = s
+        #     patches1[:,:,2] = s
 
-        # self.patches_[self.n] = patches
+        # # TODO better depth initialization
+        # patches2[:,:,2] = torch.rand_like(patches2[:,:,2,0,0,None,None])
+        # if self.is_initialized:
+        #     s = torch.median(self.patches_[self.n-3:self.n,:,2])
+        #     patches2[:,:,2] = s
 
-        # TODO better depth initialization
-        patches1[:,:,2] = torch.rand_like(patches1[:,:,2,0,0,None,None])
-        if self.is_initialized:
-            s = torch.median(self.patches_[self.n-3:self.n,:,2])
-            patches1[:,:,2] = s
-
-        # TODO better depth initialization
-        patches2[:,:,2] = torch.rand_like(patches2[:,:,2,0,0,None,None])
-        if self.is_initialized:
-            s = torch.median(self.patches_[self.n-3:self.n,:,2])
-            patches2[:,:,2] = s
-
-        # TODO better depth initialization
-        patches3[:,:,2] = torch.rand_like(patches3[:,:,2,0,0,None,None])
-        if self.is_initialized:
-            s = torch.median(self.patches_[self.n-3:self.n,:,2])
-            patches3[:,:,2] = s
+        # # TODO better depth initialization
+        # patches3[:,:,2] = torch.rand_like(patches3[:,:,2,0,0,None,None])
+        # if self.is_initialized:
+        #     s = torch.median(self.patches_[self.n-3:self.n,:,2])
+        #     patches3[:,:,2] = s
 
         # cost1 = self.getCost(patches1)
         # cost2 = self.getCost(patches2)
