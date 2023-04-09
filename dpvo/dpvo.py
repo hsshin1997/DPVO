@@ -335,14 +335,23 @@ class DPVO:
         
         # patch 1
         with autocast(enabled=self.cfg.MIXED_PRECISION):
-            fmap, gmap, imap, patches, _, clr = \
+            fmap1, gmap1, imap1, patches1, _, clr1 = \
                 self.network.patchify(image,
                     patches_per_image=self.cfg.PATCHES_PER_FRAME, 
                     gradient_bias=self.cfg.GRADIENT_BIAS, 
                     return_color=True)
+        
+        patches1[:,:,2] = torch.rand_like(patches1[:,:,2,0,0,None,None])
+        if self.is_initialized:
+            s = torch.median(self.patches_[self.n-3:self.n,:,2])
+            patches1[:,:,2] = s
+
+        (ii, jj, kk) = (self.ii, self.jj, self.kk)
+        coords = pops.transform(SE3(self.poses), patches1, self.intrinsics, ii, jj, kk)
+
         # patch 2
         with autocast(enabled=self.cfg.MIXED_PRECISION):
-            fmap, gmap, imap, patches, _, clr = \
+            fmap2, gmap2, imap2, patches2, _, clr2 = \
                 self.network.patchify(image,
                     patches_per_image=self.cfg.PATCHES_PER_FRAME, 
                     gradient_bias=self.cfg.GRADIENT_BIAS, 
@@ -350,7 +359,7 @@ class DPVO:
         
         # patch 3
         with autocast(enabled=self.cfg.MIXED_PRECISION):
-            fmap, gmap, imap, patches, _, clr = \
+            fmap3, gmap3, imap3, patches3, _, clr3 = \
                 self.network.patchify(image,
                     patches_per_image=self.cfg.PATCHES_PER_FRAME, 
                     gradient_bias=self.cfg.GRADIENT_BIAS, 
