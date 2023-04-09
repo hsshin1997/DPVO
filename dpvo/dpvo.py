@@ -45,6 +45,10 @@ class DPVO:
         self.patches_ = torch.zeros(self.N, self.M, 3, self.P, self.P, dtype=torch.float, device="cuda")
         self.intrinsics_ = torch.zeros(self.N, 4, dtype=torch.float, device="cuda")
 
+        self.patches1_ = torch.zeros(self.N, self.M, 3, self.P, self.P, dtype=torch.float, device="cuda")
+        self.patches2_ = torch.zeros(self.N, self.M, 3, self.P, self.P, dtype=torch.float, device="cuda")
+        self.patches3_ = torch.zeros(self.N, self.M, 3, self.P, self.P, dtype=torch.float, device="cuda")
+
         self.points_ = torch.zeros(self.N * self.M, 3, dtype=torch.float, device="cuda")
         self.colors_ = torch.zeros(self.N, self.M, 3, dtype=torch.uint8, device="cuda")
 
@@ -133,6 +137,18 @@ class DPVO:
     @property
     def patches(self):
         return self.patches_.view(1, self.N*self.M, 3, 3, 3)
+    
+    @property
+    def patches1(self):
+        return self.patches1_.view(1, self.N*self.M, 3, 3, 3)
+    
+    @property
+    def patches2(self):
+        return self.patches2_.view(1, self.N*self.M, 3, 3, 3)
+    
+    @property
+    def patches3(self):
+        return self.patches3_.view(1, self.N*self.M, 3, 3, 3)
 
     @property
     def intrinsics(self):
@@ -317,11 +333,8 @@ class DPVO:
                 w_ij = coords[0, i, :, j, k]
                 x_hat_ij = self.patches[0, i, 0:2, j, k]
                 cost += torch.norm(w_ij.sub((x_hat_ij).add(delta_ij)))**2                    
-        print("cost is: ")
-        print(cost)
+        return cost
 
-
-                
     def __edges_all(self):
         return flatmeshgrid(
             torch.arange(0, self.m, device="cuda"),
