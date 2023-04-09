@@ -303,7 +303,7 @@ class DPVO:
         print("Patches: ")
         print(self.patches_.size())
         print("delta: ")
-        print(delta)
+        print(delta.size())
         print()
                 
     def __edges_all(self):
