@@ -270,6 +270,9 @@ class DPVO:
     def update(self):
         with Timer("other", enabled=self.enable_timing):
             coords = self.reproject()
+            print("coords: (line 273 of dpvo.py)")
+            print(coords.size())
+            
 
             with autocast(enabled=True):
                 corr = self.corr(coords)
