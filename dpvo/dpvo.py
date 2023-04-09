@@ -270,10 +270,6 @@ class DPVO:
     def update(self):
         with Timer("other", enabled=self.enable_timing):
             coords = self.reproject()
-            print("coords: (line 273 of dpvo.py)")
-            print(coords.size())
-
-
             with autocast(enabled=True):
                 corr = self.corr(coords)
                 ctx = self.imap[:,self.kk % (self.M * self.mem)]
@@ -298,6 +294,11 @@ class DPVO:
             points = (points[...,1,1,:3] / points[...,1,1,3:]).reshape(-1, 3)
             self.points_[:len(points)] = points[:]
         
+        print("self.ii")
+        print(self.ii.size())
+        print("coords: (line 297 of dpvo.py)")
+        print(coords.size())
+        print(coords[0, 1,:,0,0])
         print("Poses:  line 298 of dpvo.py")
         print(self.poses.size())
         print("Patches: ")
