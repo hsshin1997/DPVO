@@ -309,21 +309,37 @@ class DPVO:
             points = pops.point_cloud(SE3(self.poses), self.patches[:, :self.m], self.intrinsics, self.ix[:self.m])
             points = (points[...,1,1,:3] / points[...,1,1,3:]).reshape(-1, 3)
             self.points_[:len(points)] = points[:]
-        
-        # print("self.ii")
-        # print(self.ii[-1])
-        # print("coords: (line 297 of dpvo.py)")
-        # print(coords.size())
-        # print(coords[0, 1,:,0,0])
-        # print("Poses:  line 298 of dpvo.py")
-        # print(self.poses.size())
-        # print("Patches: ")
-        # print(self.patches.size())
-        # print(self.patches[0,1,0:2,0,0])
-        # print("delta: ")
-        # print(delta.size())
-        # print(delta[0,1])
-        # print()
+    
+    def getCost(self, patches):
+        with Timer("other", enabled=self.enable_timing):
+            (ii, jj, kk) = indicies if indicies is not None else (self.ii, self.jj, self.kk)
+            coords = pops.transform(SE3(self.poses), patches, self.intrinsics, ii, jj, kk)
+
+            coords =  coords.permute(0, 1, 4, 2, 3).contiguous()
+
+            with autocast(enabled=True):
+                corr = self.corr(coords)
+                ctx = self.imap[:,self.kk % (self.M * self.mem)]
+                self.net, (delta, weight, _) = \
+                    self.network.update(self.net, ctx, corr, None, self.ii, self.jj, self.kk)
+            
+            lmbda = torch.as_tensor([1e-4], device="cuda")
+            weight = weight.float()
+            target = coords[...,self.P//2,self.P//2] + delta.float()
+                
+        with Timer("BA", enabled=self.enable_timing):
+            t0 = self.n - self.cfg.OPTIMIZATION_WINDOW if self.is_initialized else 1
+            t0 = max(t0, 1)
+
+            try:
+                fastba.BA(self.poses, self.patches, self.intrinsics, 
+                    target, weight, lmbda, self.ii, self.jj, self.kk, t0, self.n, 2)
+            except:
+                print("Warning BA failed...")
+            
+            points = pops.point_cloud(SE3(self.poses), self.patches[:, :self.m], self.intrinsics, self.ix[:self.m])
+            points = (points[...,1,1,:3] / points[...,1,1,3:]).reshape(-1, 3)
+            self.points_[:len(points)] = points[:]
 
         cost = 0
         i = self.ii[-1]
@@ -332,9 +348,9 @@ class DPVO:
             for k in range(3):
                 w_ij = coords[0, i, :, j, k]
                 x_hat_ij = self.patches[0, i, 0:2, j, k]
-                cost += torch.norm(w_ij.sub((x_hat_ij).add(delta_ij)))**2                    
-        return cost
-
+                cost += torch.norm(w_ij.sub((x_hat_ij).add(delta_ij)))**2          
+        return cost      
+        
     def __edges_all(self):
         return flatmeshgrid(
             torch.arange(0, self.m, device="cuda"),
@@ -372,6 +388,27 @@ class DPVO:
                     patches_per_image=self.cfg.PATCHES_PER_FRAME, 
                     gradient_bias=self.cfg.GRADIENT_BIAS, 
                     return_color=True)
+            
+        with autocast(enabled=self.cfg.MIXED_PRECISION):
+            fmap1, gmap1, imap1, patches1, _, clr1 = \
+                self.network.patchify(image,
+                    patches_per_image=self.cfg.PATCHES_PER_FRAME, 
+                    gradient_bias=self.cfg.GRADIENT_BIAS, 
+                    return_color=True)
+        
+        with autocast(enabled=self.cfg.MIXED_PRECISION):
+            fmap2, gmap2, imap2, patches2, _, clr2 = \
+                self.network.patchify(image,
+                    patches_per_image=self.cfg.PATCHES_PER_FRAME, 
+                    gradient_bias=self.cfg.GRADIENT_BIAS, 
+                    return_color=True)
+            
+        with autocast(enabled=self.cfg.MIXED_PRECISION):
+            fmap3, gmap3, imap3, patches3, _, clr3 = \
+                self.network.patchify(image,
+                    patches_per_image=self.cfg.PATCHES_PER_FRAME, 
+                    gradient_bias=self.cfg.GRADIENT_BIAS, 
+                    return_color=True)
 
         ### update state attributes ###
         self.tlist.append(tstamp)
@@ -385,6 +422,15 @@ class DPVO:
         self.index_[self.n + 1] = self.n + 1
         self.index_map_[self.n + 1] = self.m + self.M
 
+        # clr1 = (clr1[0,:,[2,1,0]] + 0.5) * (255.0 / 2)
+        # self.colors_[self.n] = clr1.to(torch.uint8)
+        
+        # clr2 = (clr2[0,:,[2,1,0]] + 0.5) * (255.0 / 2)
+        # self.colors_[self.n] = clr2.to(torch.uint8)
+        
+        # clr3 = (clr3[0,:,[2,1,0]] + 0.5) * (255.0 / 2)
+        # self.colors_[self.n] = clr3.to(torch.uint8)
+
         if self.n > 1:
             if self.cfg.MOTION_MODEL == 'DAMPED_LINEAR':
                 P1 = SE3(self.poses_[self.n-1])
@@ -397,13 +443,35 @@ class DPVO:
                 tvec_qvec = self.poses[self.n-1]
                 self.poses_[self.n] = tvec_qvec
 
+        # # TODO better depth initialization
+        # patches[:,:,2] = torch.rand_like(patches1[:,:,2,0,0,None,None])
+        # if self.is_initialized:
+        #     s = torch.median(self.patches_[self.n-3:self.n,:,2])
+        #     patches[:,:,2] = s
+
+        # self.patches_[self.n] = patches
+
         # TODO better depth initialization
-        patches[:,:,2] = torch.rand_like(patches[:,:,2,0,0,None,None])
+        patches1[:,:,2] = torch.rand_like(patches1[:,:,2,0,0,None,None])
         if self.is_initialized:
             s = torch.median(self.patches_[self.n-3:self.n,:,2])
-            patches[:,:,2] = s
+            patches1[:,:,2] = s
 
-        self.patches_[self.n] = patches
+        # TODO better depth initialization
+        patches2[:,:,2] = torch.rand_like(patches2[:,:,2,0,0,None,None])
+        if self.is_initialized:
+            s = torch.median(self.patches_[self.n-3:self.n,:,2])
+            patches2[:,:,2] = s
+
+        # TODO better depth initialization
+        patches3[:,:,2] = torch.rand_like(patches3[:,:,2,0,0,None,None])
+        if self.is_initialized:
+            s = torch.median(self.patches_[self.n-3:self.n,:,2])
+            patches3[:,:,2] = s
+
+        cost1 = self.getCost(patches1)
+        cost2 = self.getCost(patches2)
+        cost3 = self.getCost(patches3)
 
         ### update network attributes ###
         self.imap_[self.n % self.mem] = imap.squeeze()
