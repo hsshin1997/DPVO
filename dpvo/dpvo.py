@@ -310,7 +310,7 @@ class DPVO:
         print(delta[0,1])
         print()
 
-        for i in self.ii.size():
+        for i in self.ii.numel():
             print(i)
 
 
