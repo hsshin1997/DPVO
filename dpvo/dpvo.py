@@ -299,9 +299,9 @@ class DPVO:
             self.points_[:len(points)] = points[:]
         
         print("Poses:  line 298 of dpvo.py")
-        print(self.poses_.size())
+        print(self.poses.size())
         print("Patches: ")
-        print(self.patches_.size())
+        print(self.patches.size())
         print("delta: ")
         print(delta.size())
         print()
