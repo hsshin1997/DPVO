@@ -295,8 +295,7 @@ class DPVO:
             self.points_[:len(points)] = points[:]
         
         print("self.ii")
-        print(self.ii)
-        print(self.jj.size())
+        print(self.ii[-1])
         print("coords: (line 297 of dpvo.py)")
         print(coords.size())
         print(coords[0, 1,:,0,0])
@@ -310,14 +309,14 @@ class DPVO:
         print(delta[0,1])
         print()
 
-        cost = 0
-        for i in range(self.ii.numel()):
-            delta_ij = delta[0, i]
-            for j in range(3):
-                for k in range(3):
-                    w_ij = coords[0, i, :, j, k]
-                    x_hat_ij = self.patches[0, i, 0:2, j, k]
-                    cost += torch.norm(w_ij.sub((x_hat_ij).add(delta_ij)))**2                    
+        # cost = 0
+        # for i in range(self.ii.numel()):
+        #     delta_ij = delta[0, i]
+        #     for j in range(3):
+        #         for k in range(3):
+        #             w_ij = coords[0, i, :, j, k]
+        #             x_hat_ij = self.patches[0, i, 0:2, j, k]
+        #             cost += torch.norm(w_ij.sub((x_hat_ij).add(delta_ij)))**2                    
                     
 
 
