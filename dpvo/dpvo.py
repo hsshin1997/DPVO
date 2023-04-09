@@ -332,6 +332,29 @@ class DPVO:
                     patches_per_image=self.cfg.PATCHES_PER_FRAME, 
                     gradient_bias=self.cfg.GRADIENT_BIAS, 
                     return_color=True)
+        
+        # patch 1
+        with autocast(enabled=self.cfg.MIXED_PRECISION):
+            fmap, gmap, imap, patches, _, clr = \
+                self.network.patchify(image,
+                    patches_per_image=self.cfg.PATCHES_PER_FRAME, 
+                    gradient_bias=self.cfg.GRADIENT_BIAS, 
+                    return_color=True)
+        # patch 2
+        with autocast(enabled=self.cfg.MIXED_PRECISION):
+            fmap, gmap, imap, patches, _, clr = \
+                self.network.patchify(image,
+                    patches_per_image=self.cfg.PATCHES_PER_FRAME, 
+                    gradient_bias=self.cfg.GRADIENT_BIAS, 
+                    return_color=True)
+        
+        # patch 3
+        with autocast(enabled=self.cfg.MIXED_PRECISION):
+            fmap, gmap, imap, patches, _, clr = \
+                self.network.patchify(image,
+                    patches_per_image=self.cfg.PATCHES_PER_FRAME, 
+                    gradient_bias=self.cfg.GRADIENT_BIAS, 
+                    return_color=True)
 
         ### update state attributes ###
         self.tlist.append(tstamp)
