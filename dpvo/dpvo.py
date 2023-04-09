@@ -295,7 +295,7 @@ class DPVO:
             self.points_[:len(points)] = points[:]
         
         print("self.ii")
-        print(self.ii.size())
+        print(self.ii)
         print(self.jj.size())
         print("coords: (line 297 of dpvo.py)")
         print(coords.size())
@@ -309,6 +309,10 @@ class DPVO:
         print(delta.size())
         print(delta[0,1])
         print()
+
+        # for i in self.ii:
+
+
                 
     def __edges_all(self):
         return flatmeshgrid(
