@@ -445,7 +445,7 @@ class DPVO:
                 self.poses_[self.n] = tvec_qvec
 
         # # TODO better depth initialization
-        patches[:,:,2] = torch.rand_like(patches1[:,:,2,0,0,None,None])
+        patches[:,:,2] = torch.rand_like(patches[:,:,2,0,0,None,None])
         if self.is_initialized:
             s = torch.median(self.patches_[self.n-3:self.n,:,2])
             patches[:,:,2] = s
