@@ -310,7 +310,7 @@ class DPVO:
             points = (points[...,1,1,:3] / points[...,1,1,3:]).reshape(-1, 3)
             self.points_[:len(points)] = points[:]
     
-    def getCost(self, patches):
+    def getCost(self, patches, indicies=None):
         with Timer("other", enabled=self.enable_timing):
             (ii, jj, kk) = indicies if indicies is not None else (self.ii, self.jj, self.kk)
             coords = pops.transform(SE3(self.poses), patches, self.intrinsics, ii, jj, kk)
