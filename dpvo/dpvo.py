@@ -317,7 +317,8 @@ class DPVO:
                 w_ij = coords[0, i, :, j, k]
                 x_hat_ij = self.patches[0, i, 0:2, j, k]
                 cost += torch.norm(w_ij.sub((x_hat_ij).add(delta_ij)))**2                    
-        print("cost is: " + cost)
+        print("cost is: ")
+        print(cost)
 
 
                 
