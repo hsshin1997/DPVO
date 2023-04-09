@@ -272,7 +272,7 @@ class DPVO:
             coords = self.reproject()
             print("coords: (line 273 of dpvo.py)")
             print(coords.size())
-            
+
 
             with autocast(enabled=True):
                 corr = self.corr(coords)
@@ -302,6 +302,8 @@ class DPVO:
         print(self.poses_.size())
         print("Patches: ")
         print(self.patches_.size())
+        print("delta: ")
+        print(delta)
         print()
                 
     def __edges_all(self):
