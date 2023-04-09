@@ -345,9 +345,9 @@ class DPVO:
         if self.is_initialized:
             s = torch.median(self.patches_[self.n-3:self.n,:,2])
             patches1[:,:,2] = s
+        self.patches_[self.n] = patches1
 
-        (ii, jj, kk) = (self.ii, self.jj, self.kk)
-        coords1 = pops.transform(SE3(self.poses), patches1, self.intrinsics, ii, jj, kk)
+        coords1 = self.reproject()
 
         # patch 2
         with autocast(enabled=self.cfg.MIXED_PRECISION):
@@ -357,6 +357,14 @@ class DPVO:
                     gradient_bias=self.cfg.GRADIENT_BIAS, 
                     return_color=True)
         
+        patches2[:,:,2] = torch.rand_like(patches1[:,:,2,0,0,None,None])
+        if self.is_initialized:
+            s = torch.median(self.patches_[self.n-3:self.n,:,2])
+            patches2[:,:,2] = s
+        self.patches_[self.n] = patches2
+
+        coords2 = self.reproject()
+
         # patch 3
         with autocast(enabled=self.cfg.MIXED_PRECISION):
             fmap3, gmap3, imap3, patches3, _, clr3 = \
