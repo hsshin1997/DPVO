@@ -310,6 +310,7 @@ class DPVO:
         print(delta[0,1])
         print()
 
+        cost = 0
         for i in range(self.ii.numel()):
             delta_ij = delta[0, i]
             for j in range(3):
