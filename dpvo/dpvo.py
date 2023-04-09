@@ -296,6 +296,7 @@ class DPVO:
         
         print("self.ii")
         print(self.ii.size())
+        print(self.jj.size())
         print("coords: (line 297 of dpvo.py)")
         print(coords.size())
         print(coords[0, 1,:,0,0])
