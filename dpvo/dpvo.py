@@ -317,7 +317,7 @@ class DPVO:
                 for k in range(3):
                     w_ij = coords[0, i, :, j, k]
                     x_hat_ij = self.patches[0, i, 0:2, j, k]
-                    cost += np.linalg.norm(w_ij.sub((x_hat_ij).add(delta_ij)))**2                    
+                    cost += w_ij.sub((x_hat_ij).add(delta_ij)).norm()**2                    
                     
 
 
