@@ -295,16 +295,10 @@ class DPVO:
             points = (points[...,1,1,:3] / points[...,1,1,3:]).reshape(-1, 3)
             self.points_[:len(points)] = points[:]
         
-        print("self.intrinsics: line 297 of dpvo.py")
-        print(self.intrinsics.size())
-        print("self.ii: line 297 of dpvo.py")
-        print(self.ii.size())
-        print("self.jj: line 297 of dpvo.py")
-        print(self.jj.size())
-        print("self.kk: line 297 of dpvo.py")
-        print(self.kk.size())
-        print("t0: ")
-        print(t0)
+        print("Poses:  line 298 of dpvo.py")
+        print(self.poses_.size())
+        print("Patches: ")
+        print(self.patches_.size())
         print()
                 
     def __edges_all(self):
