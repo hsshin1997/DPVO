@@ -315,7 +315,7 @@ class DPVO:
             for j in range(3):
                 for k in range(3):
                     w_ij = coords[0, i, :, j, k]
-                    x_hat_ij = self.patches[0, i, 0:2, i, j]
+                    x_hat_ij = self.patches[0, i, 0:2, j, k]
                     
                     
 
