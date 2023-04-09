@@ -470,9 +470,9 @@ class DPVO:
             s = torch.median(self.patches_[self.n-3:self.n,:,2])
             patches3[:,:,2] = s
 
-        cost1 = self.getCost(patches1)
-        cost2 = self.getCost(patches2)
-        cost3 = self.getCost(patches3)
+        # cost1 = self.getCost(patches1)
+        # cost2 = self.getCost(patches2)
+        # cost3 = self.getCost(patches3)
 
         ### update network attributes ###
         self.imap_[self.n % self.mem] = imap.squeeze()
