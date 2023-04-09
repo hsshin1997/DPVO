@@ -312,11 +312,11 @@ class DPVO:
     
     def getCost(self, patches, indicies=None):
         with Timer("other", enabled=self.enable_timing):
-            (ii, jj, kk) = indicies if indicies is not None else (self.ii, self.jj, self.kk)
-            print("problem is here")
-            coords = pops.transform(SE3(self.poses), patches, self.intrinsics, ii, jj, kk)
+            # (ii, jj, kk) = indicies if indicies is not None else (self.ii, self.jj, self.kk)
+            # coords = pops.transform(SE3(self.poses), patches, self.intrinsics, ii, jj, kk)
 
-            coords =  coords.permute(0, 1, 4, 2, 3).contiguous()
+            # coords =  coords.permute(0, 1, 4, 2, 3).contiguous()
+            coords = self.reproject()
 
             with autocast(enabled=True):
                 corr = self.corr(coords)
