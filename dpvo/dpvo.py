@@ -171,8 +171,9 @@ class DPVO:
         tstamps = np.array(self.tlist, dtype=np.float)
 
         name = "ocean_data"
-        save_trajectory_tum_format(poses, f"saved_trajectories/{name}.txt")
-        plot_trajectory(poses, title=f"DPVO Trajectory Prediction for {name}", filename=f"trajectory_plots/{name}.pdf")
+        # save_trajectory_tum_format(poses, f"saved_trajectories/{name}.txt")
+        # plot_trajectory(poses, title=f"DPVO Trajectory Prediction for {name}", filename=f"trajectory_plots/{name}.pdf")
+        np.savetxt('poses.txt', poses, fmt='%f')
 
         print(poses)
         
