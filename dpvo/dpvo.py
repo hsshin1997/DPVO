@@ -313,8 +313,6 @@ class DPVO:
 
     def update(self):
 
-        if self.counter is 50:
-            torch.save(self.patches_, "patches.pt")
 
         with Timer("other", enabled=self.enable_timing):
             coords = self.reproject()
@@ -373,7 +371,10 @@ class DPVO:
                     # compute the residual with the new poses
                     coords = self.reproject(poses=self.tmp_poses, patches=self.tmp_patches)
                     fitting_error = (coords[..., self.P // 2, self.P // 2] - target).pow(2).mean().item()
-
+                    
+                    if self.counter is 50:
+                        filename = f'{i}.pt'
+                        torch.save(best_patches, filename)
                     print("Fitting error ", fitting_error)
                     if fitting_error < best_fit:
                         print("New best fit ", fitting_error)
@@ -382,6 +383,9 @@ class DPVO:
                         best_patches = self.tmp_patches.clone()
                 except:
                     print("Warning BA failed...")
+            
+            if self.counter is 50:
+                torch.save(best_patches, "best_patches.pt")
 
             self.poses_ = best_poses.view(*pose_shape)
             self.patches_ =  best_patches.view(*patch_shape)
