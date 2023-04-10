@@ -8,7 +8,9 @@ original_DPVO = torch.load("./original.pt")
 
 filename = 'P006/pose_left.txt'
 data = np.loadtxt(filename, delimiter=' ', skiprows=1, dtype=float)
-# print(data)
+
+# print(data.size())
+print(original_DPVO.size())
 
 plt.plot(data[:,0], data[:,1], label = "Ground Truth")
 plt.plot(original_DPVO[:,0].cpu(), original_DPVO[:,1].cpu(), label = "DPVO")
