@@ -4,8 +4,13 @@ import torch
 import sys
 from PIL import Image, ImageDraw
 
-
-
+def rectangle(output_path):
+    image = Image.new("RGB", (400, 400), "blue")
+    draw = ImageDraw.Draw(image)
+    draw.rectangle((200, 100, 300, 200), fill="red")
+    draw.rectangle((50, 50, 150, 150), fill="green", outline="yellow",
+                   width=3)
+    image.save(output_path)
 
 
 if __name__ == '__main__':
@@ -17,13 +22,25 @@ if __name__ == '__main__':
 
     best_patch = torch.load('patch_folder/best_patches.pt')
 
+    print(patch1.size())
     print(best_patch[0, 0, :, 1, 1])
 
-    with Image.open("../.jpg") as im:
+    with Image.open("patch_folder/000104_left.png") as im:
 
         draw = ImageDraw.Draw(im)
-        draw.line((0, 0) + im.size, fill=128)
-        draw.line((0, im.size[1], im.size[0], 0), fill=128)
+        for i in range(196608):
+            v1 = best_patch[0, i, 0:2, 0, 0]
+            v2 = best_patch[0, i, 0:2, 0, 2]
+            v3 = best_patch[0, i, 0:2, 2, 0]
+            v4 = best_patch[0, i, 0:2, 2, 2]
+            # print(v1, v2, v3, v4)
+            draw.rectangle((v1[0], v1[1], v4[0], v4[1]), fill="red")
 
+            v1 = patch3[0, i, 0:2, 0, 0]
+            v2 = patch3[0, i, 0:2, 0, 2]
+            v3 = patch3[0, i, 0:2, 2, 0]
+            v4 = patch3[0, i, 0:2, 2, 2]
+            draw.rectangle((v1[0], v1[1], v4[0], v4[1]), fill="blue")
+            # print(v1, v2, v3, v4)
         # write to stdout
-        im.save(sys.stdout, "PNG")
+        im.save('patch_folder/image_with_patches.png')

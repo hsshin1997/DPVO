@@ -374,7 +374,7 @@ class DPVO:
                     
                     if self.counter is 104:
                         filename = f'{i}.pt'
-                        torch.save(best_patches, filename)
+                        torch.save(self.tmp_patches, filename)
                     print("Fitting error ", fitting_error)
                     if fitting_error < best_fit:
                         print("New best fit ", fitting_error)
