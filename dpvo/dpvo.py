@@ -198,7 +198,6 @@ class DPVO:
         return coords.permute(0, 1, 4, 2, 3).contiguous()
 
     def append_factors(self, ii, jj):
-        print('================ add =============')
         self.jj = torch.cat([self.jj, jj])
         self.kk = torch.cat([self.kk, ii])
         self.ii = torch.cat([self.ii, self.ix[ii]])
@@ -280,21 +279,21 @@ class DPVO:
     # def update(self):
     #     with Timer("other", enabled=self.enable_timing):
     #         coords = self.reproject()
-
+    #
     #         with autocast(enabled=True):
     #             corr = self.corr(coords)
     #             ctx = self.imap[:, self.kk % (self.M * self.mem)]
     #             self.net, (delta, weight, _) = \
     #                 self.network.update(self.net, ctx, corr, None, self.ii, self.jj, self.kk)
-
+    #
     #         lmbda = torch.as_tensor([1e-4], device="cuda")
     #         weight = weight.float()
     #         target = coords[..., self.P // 2, self.P // 2] + delta.float()
-
+    #
     #     with Timer("BA", enabled=self.enable_timing):
     #         t0 = self.n - self.cfg.OPTIMIZATION_WINDOW if self.is_initialized else 1
     #         t0 = max(t0, 1)
-
+    #
     #         try:
     #             fastba.BA(self.poses, self.patches, self.intrinsics,
     #                       target, weight, lmbda, self.ii, self.jj, self.kk, t0, self.n, 2)
@@ -303,7 +302,7 @@ class DPVO:
     #             print("Fitting error ", fitting_error)
     #         except:
     #             print("Warning BA failed...")
-
+    #
     #         points = pops.point_cloud(SE3(self.poses), self.patches[:, :self.m], self.intrinsics,
     #                                   self.ix[:self.m])
     #         points = (points[..., 1, 1, :3] / points[..., 1, 1, 3:]).reshape(-1, 3)
@@ -312,29 +311,29 @@ class DPVO:
     def update(self):
         with Timer("other", enabled=self.enable_timing):
             coords = self.reproject()
-    
+
             with autocast(enabled=True):
                 corr = self.corr(coords)
                 ctx = self.imap[:, self.kk % (self.M * self.mem)]
                 self.net, (delta, weight, _) = \
                     self.network.update(self.net, ctx, corr, None, self.ii, self.jj, self.kk)
-    
+
             lmbda = torch.as_tensor([1e-4], device="cuda")
             weight = weight.float()
             target = coords[..., self.P // 2, self.P // 2] + delta.float()
-    
+
         with Timer("BA", enabled=self.enable_timing):
             t0 = self.n - self.cfg.OPTIMIZATION_WINDOW if self.is_initialized else 1
             t0 = max(t0, 1)
-    
+
             best_fit = 1e10
-            sample_ratio = 0.0
+            sample_ratio = 0.2
             best_poses = None
             best_patches = None
             pose_shape = self.poses_.shape
             patch_shape = self.patches_.shape
             print("---------------------------------")
-            for i in range(1):
+            for i in range(5):
                 try:
                     # assert torch.sum(self.poses==self.poses_)
                     self.tmp_poses = self.poses.clone()
@@ -367,7 +366,7 @@ class DPVO:
                     # compute the residual with the new poses
                     coords = self.reproject(poses=self.tmp_poses, patches=self.tmp_patches)
                     fitting_error = (coords[..., self.P // 2, self.P // 2] - target).pow(2).mean().item()
-    
+
                     print("Fitting error ", fitting_error)
                     if fitting_error < best_fit:
                         print("New best fit ", fitting_error)
@@ -376,7 +375,7 @@ class DPVO:
                         best_patches = self.tmp_patches.clone()
                 except:
                     print("Warning BA failed...")
-    
+
             self.poses_ = best_poses.view(*pose_shape)
             self.patches_ =  best_patches.view(*patch_shape)
             assert torch.sum(self.poses == self.poses_)
