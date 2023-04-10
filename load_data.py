@@ -8,6 +8,7 @@ from evo.core.trajectory import PoseTrajectory3D
 from evo.core.metrics import PoseRelation
 
 poses = torch.load("./poses.pt")
+timestamps = torch.load("./tstamps.pt")
 # original_DPVO = torch.load("./original.pt")
 
 
@@ -15,10 +16,11 @@ filename = 'P006/pose_left.txt'
 data = np.loadtxt(filename, delimiter=' ', skiprows=1, dtype=float)
 
 traj_est = PoseTrajectory3D(
-        positions_xyz=data[:,:3],
-        orientations_quat_wxyz=data[:,3:],
-        timestamps=timestamps)
+        positions_xyz=poses[:,:3].cpu(),
+        orientations_quat_wxyz=poses[:,3:].cpu(),
+        timestamps=timestamps.cpu())
 
+print(traj_est.positions_xyz)
 # print(data.size())
 # print(original_DPVO.size())
 
@@ -40,6 +42,7 @@ traj_est = PoseTrajectory3D(
 print(poses)
 plt.plot(data[:,0], data[:,1], label = "Ground Truth")
 # plt.plot(original_DPVO[:,2].cpu(), original_DPVO[:,0].cpu(), label = "DPVO")
-plt.plot(poses[:,0].cpu(), poses[:,1].cpu(), label = "Patch Improvement")
+# plt.plot(poses[:,0].cpu(), poses[:,1].cpu(), label = "Patch Improvement")
+plt.plot(traj_est.positions_xyz[:,0], traj_est.positions_xyz[:,1], label = "Patch Improvement")
 plt.legend()
 plt.show()
