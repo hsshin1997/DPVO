@@ -70,6 +70,7 @@ def run(cfg, network, imagedir, calib, stride=1, skip=0, viz=False, timeit=False
     print(slam.poses_[:,0])
     print(slam.n)
     # np.savetxt('pose.txt', slam.poses_.numpy())
+    name = "ocean_data"
     save_trajectory_tum_format(slam, f"saved_trajectories/{name}.txt")
     plot_trajectory(slam, title=f"DPVO Trajectory Prediction for {name}", filename=f"trajectory_plots/{name}.pdf")
     return slam.terminate()
