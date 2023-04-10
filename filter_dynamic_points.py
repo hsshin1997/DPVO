@@ -70,7 +70,6 @@ def compute_epipolar_line(p1, E, K):
 
 # plot optical flow (downsample)
 def plot_optical_flow_all_pts(img, flow, window_name, flow_dist_thresh=2, window_size=(640, 480)):
-    # Create a named window with the desired size
     cv2.namedWindow(window_name, cv2.WINDOW_NORMAL)
     cv2.resizeWindow(window_name, window_size)
 
@@ -99,7 +98,6 @@ def plot_optical_flow_all_pts(img, flow, window_name, flow_dist_thresh=2, window
 
 # plot optical flow, only plot points with larger move than thresh, and donw sample points
 def plot_optical_flow(img, flow, window_name, flow_dist_thresh=2, visualizatino_scale=1, window_size=(640, 480)):
-    # Create a named window with the desired size (3 times larger)
     # cv2.namedWindow(window_name, cv2.WINDOW_NORMAL)
     # cv2.resizeWindow(window_name, window_size[0]*visualizatino_scale, window_size[1]*visualizatino_scale)
 
@@ -283,12 +281,8 @@ def main():
 
         T_pre_cur = T_inv(T_pre) @ T_cur
         T_cur_pre = T_inv(T_cur) @ T_pre
-        # print("T_cur\n",T_cur)
-        # print("T_pre\n", T_pre)
-        # print(T_cur_pre)
 
         E = essential_matrix(T_pre_cur[:3, :3], T_pre_cur[:3, 3])
-        # E = essential_matrix(T_cur_pre[:3, :3], T_cur_pre[:3, 3])
         print("---- frame cur {} pre {} ".format(cur_id, pre_id))
         
         # gt flow
@@ -297,9 +291,6 @@ def main():
         # calculated flow
         img1_path = data_dir + "image_left/{}_left.png".format(pre_id)
         img2_path = data_dir + "image_left/{}_left.png".format(cur_id)
-        #cal_flow, valid_flow = compute_optical_flow(img1_path, img2_path) # flow from opencv
-        #flow = cal_flow
-
         
         # visualization before filtering dynamic objects
         img1 = cv2.imread(img1_path)
@@ -309,13 +300,28 @@ def main():
         # Note: this method to filter dynamic objects is based on epipolar geometry, it will degenerate under pure rotation or large rotation
         epipolar_dists = []
         filtered_flow_coordinates = []
+        count_valid = 0
+        count_not_valid = 0
+        x = np.zeros((flow.shape[0], flow.shape[1]))
+        y = np.zeros((flow.shape[0], flow.shape[1]))
+        for row in range(0, flow.shape[0]):
+            for col in range(0, flow.shape[1]):
+                x[row, col] = flow[row, col][0]
+                y[row, col] = flow[row, col][1]
+        x_avg = np.mean(x)
+        y_avg = np.mean(y)
+
         for row in range(0, flow.shape[0]):
             for col in range(0, flow.shape[1]):
                 dx, dy = flow[row, col]
                 # whether is this point flow valid (invalid if too small)
-                dist = np.sqrt(dx ** 2 + dy ** 2)
-                if dist < 1.0:
+                dist = np.sqrt( (dx-x_avg) ** 2 + (dy-y_avg) ** 2)
+                # print("dist is ", dist)
+                if dist < 8:
+                    count_not_valid += 1
                     continue
+                else:
+                    count_valid += 1
 
                 p_pre = np.array([col, row])
                 p_cur = np.array([col + dx, row + dy])
@@ -327,10 +333,10 @@ def main():
                     filtered_flow_coordinates.append(np.array([row, col]))
                     flow[row, col][0] = 0
                     flow[row, col][1] = 0
-
+        print("count_valid: ", count_valid)
+        print("count_not_valid: ", count_not_valid)
+        # print(epipolar_dists)
         # visualization after filtering dynamic objects
-        # flow_img_after = plot_optical_flow(img1, flow, "filtered flow {}_{}".format(pre_id, cur_id))
-
         filter_mask = np.zeros((img1.shape[0], img1.shape[1]), dtype=np.uint8)
         vis = img1
         for coor in filtered_flow_coordinates:
@@ -340,20 +346,10 @@ def main():
         #change blue channel 
         vis[filter_mask == 255, 0] = 255
 
-        # load test dataset gt mask
-        # mask = np.load(data_dir + "flow/{}_{}_mask.npy".format(pre_id, cur_id))
-        # vis[mask != 0, 2] = 255
 
         concatenated_image = cv2.hconcat([flow_img_before, vis])
-        cv2.imwrite("./result/{}_result.png".format(cur_id), concatenated_image)
+        cv2.imwrite("./result_2.0/{}_result.png".format(cur_id), concatenated_image)
 
-        # window_name = "filterd points"
-        # visual_scale = 3
-        # cv2.namedWindow(window_name, cv2.WINDOW_NORMAL)
-        # cv2.resizeWindow(window_name, width * visual_scale, height * visual_scale)
-        # cv2.imshow(window_name, concatenated_image)
-        # cv2.waitKey()
-        # cv2.destroyAllWindows()
 
 
 if __name__ == '__main__':
@@ -361,7 +357,4 @@ if __name__ == '__main__':
     Usage: python3 filter_dynamic_points.py P006/
     '''
     main()
-
-
-    
 
