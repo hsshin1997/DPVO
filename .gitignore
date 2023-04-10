@@ -163,3 +163,4 @@ TartanAirResults
 thirdparty/*
 
 result/
+*.pt
