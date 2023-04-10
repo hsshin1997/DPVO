@@ -372,7 +372,7 @@ class DPVO:
                     coords = self.reproject(poses=self.tmp_poses, patches=self.tmp_patches)
                     fitting_error = (coords[..., self.P // 2, self.P // 2] - target).pow(2).mean().item()
                     
-                    if self.counter is 50:
+                    if self.counter is 104:
                         filename = f'{i}.pt'
                         torch.save(best_patches, filename)
                     print("Fitting error ", fitting_error)
@@ -384,7 +384,7 @@ class DPVO:
                 except:
                     print("Warning BA failed...")
             
-            if self.counter is 50:
+            if self.counter is 104:
                 torch.save(best_patches, "best_patches.pt")
 
             self.poses_ = best_poses.view(*pose_shape)
