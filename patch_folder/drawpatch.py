@@ -19,10 +19,11 @@ if __name__ == '__main__':
     patch2 = torch.load('patch_folder/2.pt')
     patch3 = torch.load('patch_folder/3.pt')
     patch4 = torch.load('patch_folder/4.pt')
+    original_patch = torch.load('patch_folder/original_patches.pt')
 
     best_patch = torch.load('patch_folder/best_patches.pt')
 
-    print(best_patch.size())
+    print(original_patch.size())
     print(best_patch[0, 0, :, 1, 1])
 
     with Image.open("patch_folder/000104_left.png") as im:
@@ -42,5 +43,12 @@ if __name__ == '__main__':
             # v4 = patch0[0, i, 0:2, 2, 2]
             # draw.rectangle((v1[0], v1[1], v4[0], v4[1]), fill="blue")
             # # print(v1, v2, v3, v4)
+        for i in range(96):
+            v1 = original_patch[0, i, 0:2, 0, 0]*4
+            v2 = original_patch[0, i, 0:2, 0, 2]*4
+            v3 = original_patch[0, i, 0:2, 2, 0]*4
+            v4 = original_patch[0, i, 0:2, 2, 2]*4
+            # print(v1, v2, v3, v4)
+            draw.rectangle((v1[0], v1[1], v4[0], v4[1]), fill="blue")
         # write to stdout
         im.save('patch_folder/image_with_patches.png')

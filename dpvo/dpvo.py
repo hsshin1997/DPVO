@@ -296,7 +296,7 @@ class DPVO:
             self.points_[:len(points)] = points[:]
         
         if self.counter == 104:
-            torch.save(self.patches, "original_patches.pt")
+            torch.save(self.patches.view(self.patches_.shape), "original_patches.pt")
                 
     def __edges_all(self):
         return flatmeshgrid(
