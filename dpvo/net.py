@@ -1,3 +1,5 @@
+import pdb
+
 import numpy as np
 import torch
 import torch.nn as nn
@@ -23,23 +25,6 @@ autocast = torch.cuda.amp.autocast
 import matplotlib.pyplot as plt
 
 DIM = 384
-
-# from skimage.measure import ransac, LineModelND
-# def select_patches_ransac(coords, num_inliers, min_samples, max_trials, residual_threshold):
-#     coords_np = coords.cpu().numpy()
-#     model, inliers = ransac(coords_np, # data
-#                              LineModelND, # Add the appropriate model class here, e.g., LineModelND, CircleModel
-#                              min_samples=min_samples,
-#                              residual_threshold=residual_threshold,
-#                              max_trials=max_trials)
-
-#     selected_coords = coords[inliers]
-#     while selected_coords.shape[0] < num_inliers:
-#         idx = np.random.choice(coords.shape[0], num_inliers - selected_coords.shape[0])
-#         extra_coords = coords[idx]
-#         selected_coords = torch.cat([selected_coords, extra_coords], axis=0)
-
-#     return selected_coords
 
 class Update(nn.Module):
     def __init__(self, p):
@@ -90,7 +75,7 @@ class Update(nn.Module):
 
     def forward(self, net, inp, corr, flow, ii, jj, kk):
         """ update operator """
-
+        # print("net", net.shape)
         net = net + inp + self.corr(corr)
         net = self.norm(net)
 
@@ -126,15 +111,14 @@ class Patchifier(nn.Module):
 
     def forward(self, images, patches_per_image=80, disps=None, gradient_bias=False, return_color=False):
         """ extract patches from input images """
-        fmap = self.fnet(images) / 4.0
-        imap = self.inet(images) / 4.0
+        fmap = self.fnet(images) / 4.0            # matching features
+        imap = self.inet(images) / 4.0            # context features
 
         b, n, c, h, w = fmap.shape
         P = self.patch_size
 
         # bias patch selection towards regions with high gradient
         if gradient_bias:
-            print("in gradient bias")
             g = self.__image_gradient(images)
             x = torch.randint(1, w-1, size=[n, 3*patches_per_image], device="cuda")
             y = torch.randint(1, h-1, size=[n, 3*patches_per_image], device="cuda")
@@ -149,20 +133,10 @@ class Patchifier(nn.Module):
         else:
             x = torch.randint(1, w-1, size=[n, patches_per_image], device="cuda")
             y = torch.randint(1, h-1, size=[n, patches_per_image], device="cuda")
-        
+
+        # coordinates of patches in the latent space
         coords = torch.stack([x, y], dim=-1).float()
-        # ========================================================================
-        # coords = torch.stack([x, y], dim=-1).float()
-        # selected_coords = []
-        # for i in range(n):
-        #     inliers = select_patches_ransac(coords[i],
-        #                                     num_inliers=patches_per_image,
-        #                                     min_samples=2, 
-        #                                     max_trials=100,
-        #                                     residual_threshold=5.0)
-        #     selected_coords.append(inliers)
-        # coords = torch.stack(selected_coords, dim=0)
-        # ========================================================================
+        # correlation_kernel.cu
         imap = altcorr.patchify(imap[0], coords, 0).view(b, -1, DIM, 1, 1)
         gmap = altcorr.patchify(fmap[0], coords, P//2).view(b, -1, 128, P, P)
 
@@ -172,17 +146,14 @@ class Patchifier(nn.Module):
         if disps is None:
             disps = torch.ones(b, n, h, w, device="cuda")
 
+        # pixel coordinates of all the patches
         grid, _ = coords_grid_with_index(disps, device=fmap.device)
         patches = altcorr.patchify(grid[0], coords, P//2).view(b, -1, 3, P, P)
-
         index = torch.arange(n, device="cuda").view(n, 1)
         index = index.repeat(1, patches_per_image).reshape(-1)
-        # print("index: line 150 at net.py")
-        # print(index)
-        
+
         if return_color:
             return fmap, gmap, imap, patches, index, clr
-
         return fmap, gmap, imap, patches, index
 
 
@@ -199,6 +170,7 @@ class CorrBlock:
         corrs = []
         for i in range(len(self.levels)):
             corrs += [ altcorr.corr(self.gmap, self.pyramid[i], coords / self.levels[i], ii, jj, self.radius, self.dropout) ]
+        pdb.set_trace()
         return torch.stack(corrs, -1).view(1, len(ii), -1)
 
 
@@ -221,26 +193,35 @@ class VONet(nn.Module):
         intrinsics = intrinsics / 4.0
         disps = disps[:, :, 1::4, 1::4].float()
 
-        # Add loop to create 3 patches. Then use the best patch using RANSAC
+        # 80 patches per image * 15 images
+        # fmap : b, n, c, h, w                      # frame features
+        # gmap : b, patches_num, 128, 3, 3          # matching features of each patch
+        # imap : b, patches_num, 128, 1, 1          # context features at the center of each patch
+        # patches : b, patches_num, 3, 3, 3.        # pixel coordinates + depth of patches
+        # ix : n * patches_num, 15 * 80 -> 1200     # frame index of patches
         fmap, gmap, imap, patches, ix = self.patchify(images, disps=disps)
 
         corr_fn = CorrBlock(fmap, gmap)
- 
+
         b, N, c, h, w = fmap.shape
         p = self.P
 
         patches_gt = patches.clone()
         Ps = poses
-
+        print("Ps", type(Ps), Ps.shape)
         d = patches[..., 2, p//2, p//2]
         patches = set_depth(patches, torch.rand_like(d))
-
+        # index of patches in first 8 frames, 8*80 = 640 patches | index of first 8 frames
+        # 640 * 8 = 5120
+        # kk: index of patches, jj: index of frames, all possible pairs
         kk, jj = flatmeshgrid(torch.where(ix < 8)[0], torch.arange(0,8, device="cuda"))
+        # ii: retrieve the index of frames of the sampled patches
         ii = ix[kk]
 
         imap = imap.view(b, -1, DIM)
         net = torch.zeros(b, len(kk), DIM, device="cuda", dtype=torch.float)
-        
+        pdb.set_trace()
+        # initialize to be identity matrix
         Gs = SE3.IdentityLike(poses)
 
         if structure_only:
@@ -249,13 +230,13 @@ class VONet(nn.Module):
         traj = []
         bounds = [-64, -64, w + 64, h + 64]
         
-        while len(traj) < STEPS:
+        while len(traj) < STEPS: # 18
             Gs = Gs.detach()
             patches = patches.detach()
 
             n = ii.max() + 1
             if len(traj) >= 8 and n < images.shape[1]:
-                if not structure_only: Gs.data[:,n] = Gs.data[:,n-1]
+                if not structure_only: Gs.data[:,n] = Gs.data[:, n-1]
                 kk1, jj1 = flatmeshgrid(torch.where(ix  < n)[0], torch.arange(n, n+1, device="cuda"))
                 kk2, jj2 = flatmeshgrid(torch.where(ix == n)[0], torch.arange(0, n+1, device="cuda"))
 
@@ -275,14 +256,21 @@ class VONet(nn.Module):
 
                 patches[:,ix==n,2] = torch.median(patches[:,(ix == n-1) | (ix == n-2),2])
                 n = ii.max() + 1
+            # Map the patches to the target frames (2d pixel coordinates)
+            coords = pops.transform(Gs, patches, intrinsics, ii, jj, kk)   # [1, 5120, 3, 3, 2]
+            coords1 = coords.permute(0, 1, 4, 2, 3).contiguous()           # [1, 5120, 2, 3, 3]
 
-            coords = pops.transform(Gs, patches, intrinsics, ii, jj, kk)
-            coords1 = coords.permute(0, 1, 4, 2, 3).contiguous()
-
+            # correlation features [1, 5120, 7, 7, 3, 3])x2
+            # then reshape to      [1, 5120, 882]
             corr = corr_fn(kk, jj, coords1)
+
             net, (delta, weight, _) = self.update(net, imap[:,kk], corr, None, ii, jj, kk)
 
             lmbda = 1e-4
+
+            # Important!!!!
+            # NOTE: why only update the center of the patch?
+            # ig the coordinates of other points doesn't matter
             target = coords[...,p//2,p//2,:] + delta
 
             ep = 10
@@ -300,4 +288,3 @@ class VONet(nn.Module):
             traj.append((valid, coords, coords_gt, Gs[:,:n], Ps[:,:n], kl))
 
         return traj
-
