@@ -312,6 +312,10 @@ class DPVO:
     #         self.points_[:len(points)] = points[:]
 
     def update(self):
+
+        if self.counter is 50:
+            torch.save(self.patches_, "patches.pt")
+
         with Timer("other", enabled=self.enable_timing):
             coords = self.reproject()
 

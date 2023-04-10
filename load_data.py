@@ -91,8 +91,8 @@ if __name__ == '__main__':
     x_pred = np.array(pred_traj.positions_xyz[:,0])
     y_pred = np.array(pred_traj.positions_xyz[:,1])
     
-    np.savetxt('x_gt.txt', x_gt)
-    np.savetxt('y_gt.txt', y_gt)
+    # np.savetxt('x_gt.txt', x_gt)
+    # np.savetxt('y_gt.txt', y_gt)
     np.savetxt('x_pred.txt', x_pred)
     np.savetxt('y_pred.txt', y_pred)
 
