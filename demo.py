@@ -64,11 +64,7 @@ def run(cfg, network, imagedir, calib, stride=1, skip=0, viz=False, timeit=False
         return slam.terminate(), PlyData([el], text=True)
 
     print("Terminating")
-    print(slam.poses_.size())
-    torch.save(slam.poses_, 'poses.pt')
-    torch.save(slam.tstamps_, 'tstamps.pt')
-    print(slam.poses_[:,0])
-    print(slam.n)
+    print(slam.counter)
     # np.savetxt('pose.txt', slam.poses_.numpy())
     # name = "ocean_data"
     # save_trajectory_tum_format(slam, f"saved_trajectories/{name}.txt")
