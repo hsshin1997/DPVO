@@ -65,8 +65,8 @@ def run(cfg, network, imagedir, calib, stride=1, skip=0, viz=False, timeit=False
 
     print("Terminating")
     print(slam.poses_.size())
-    # torch.save(slam.poses_, 'poses.txt')
-    np.savetxt('pose.txt', slam.poses_.numpy())
+    torch.save(slam.poses_, 'poses.pt')
+    # np.savetxt('pose.txt', slam.poses_.numpy())
     return slam.terminate()
 
 
