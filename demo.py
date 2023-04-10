@@ -64,6 +64,7 @@ def run(cfg, network, imagedir, calib, stride=1, skip=0, viz=False, timeit=False
         return slam.terminate(), PlyData([el], text=True)
 
     print("Terminating")
+    print(slam.poses_.size())
     return slam.terminate()
 
 
