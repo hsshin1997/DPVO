@@ -9,13 +9,13 @@ from pathlib import Path
 from copy import deepcopy
 
 import numpy as np
-import torch
 import matplotlib.pyplot as plt
 
-import evo
+# import evo
 from evo.core import sync
 import evo.main_ape as main_ape
 from evo.core.trajectory import PoseTrajectory3D
+# from evo.tools import plot
 from evo.core.metrics import PoseRelation
 
 test_split = \
@@ -29,68 +29,76 @@ def make_traj(args) -> PoseTrajectory3D:
     if isinstance(args, tuple):
         traj, tstamps = args
         return PoseTrajectory3D(positions_xyz=traj[:,:3], orientations_quat_wxyz=traj[:,3:], timestamps=tstamps)
+    # print("type(args): ", type(args))
+    # print("args: ", args)
+    # print("isinstance(args, PoseTrajectory3D): ", isinstance(args, PoseTrajectory3D))
     assert isinstance(args, PoseTrajectory3D), type(args)
     return deepcopy(args)
 
+def ate(traj_ref, traj_est, timestamps):
+
+    traj_est = PoseTrajectory3D(
+        positions_xyz=traj_est[:,:3],
+        orientations_quat_wxyz=traj_est[:,3:],
+        timestamps=timestamps)
+
+    traj_ref = PoseTrajectory3D(
+        positions_xyz=traj_ref[:,:3],
+        orientations_quat_wxyz=traj_ref[:,3:],
+        timestamps=timestamps)
+    
+    result = main_ape.ape(traj_ref, traj_est, est_name='traj', 
+        pose_relation=PoseRelation.translation_part, align=True, correct_scale=True)
+
+    return result.stats["rmse"]
 
 if __name__ == '__main__':
 
+    results = {}
+    all_results = []
+
     # load ground truth (reference) trajectory
     traj_ref = 'P006/pose_left.txt'
-    traj_ref = np.loadtxt(traj_ref, delimiter=" ")[::STRIDE,[1, 2, 0, 4, 5, 3, 6]]
+    traj_ref = np.loadtxt(traj_ref, delimiter=" ")
 
     # load DPVO (estimate) trajectory 
-    poses= np.loadtxt('poses.txt', dtype=np.float)
-    tstamps = np.loadtxt('tstamps.txt', dtype=np.float)
+    traj_est= np.loadtxt('poses.txt', dtype=np.float64)
+    tstamps = np.loadtxt('tstamps.txt', dtype=np.float64)
 
-    # poses = torch.load("./poses.pt")
-    # poses= np.loadtxt('poses.txt', dtype=float)
-    # timestamps = torch.load("./tstamps.pt")
-    # original_DPVO = torch.load("./original.pt")
+    # do evaluation
+    ate_score = ate(traj_ref, traj_est, tstamps)
+    print(ate_score)
 
+    pred_traj = PoseTrajectory3D(
+        positions_xyz=traj_est[:,:3],
+        orientations_quat_wxyz=traj_est[:,3:],
+        timestamps=tstamps)
+    
+    gt_traj = PoseTrajectory3D(
+        positions_xyz=traj_ref[:,:3],
+        orientations_quat_wxyz=traj_ref[:,3:],
+        timestamps=tstamps)
 
-    # filename = 'P006/pose_left.txt'
-    # ground_truth_data = np.loadtxt(filename, delimiter=' ', skiprows=1, dtype=float)
+    pred_traj = make_traj(pred_traj)
+    gt_traj = make_traj(gt_traj)
 
-    # traj_est = PoseTrajectory3D(
-    #         positions_xyz=poses[:,:3],
-    #         orientations_quat_wxyz=poses[:,3:],
-    #         timestamps=timestamps.cpu())
+    gt_traj, pred_traj = sync.associate_trajectories(gt_traj, pred_traj)
 
-    # traj_ref = PoseTrajectory3D(
-    #         positions_xyz=ground_truth_data[:,:3],
-    #         orientations_quat_wxyz=ground_truth_data[:,3:],
-    #         timestamps=timestamps.cpu())
+    pred_traj.align(gt_traj, correct_scale=True)
 
-    # traj_est = make_traj(traj_est)
-    # traj_ref = make_traj(traj_ref)
+    x_gt = np.array(gt_traj.positions_xyz[:,0])
+    y_gt = np.array(gt_traj.positions_xyz[:,1])
+    x_pred = np.array(pred_traj.positions_xyz[:,0])
+    y_pred = np.array(pred_traj.positions_xyz[:,1])
+    
+    np.savetxt('x_gt.txt', x_gt)
+    np.savetxt('y_gt.txt', y_gt)
+    np.savetxt('x_pred.txt', x_pred)
+    np.savetxt('y_pred.txt', y_pred)
 
-
-    # traj_ref, traj_est = sync.associate_trajectories(traj_ref, traj_est)
-
-    # print(traj_est.positions_xyz)
-    # print(data.size())
-    # print(original_DPVO.size())
-
-    # def ate(traj_ref, traj_est, timestamps):
-        
-
-    #     
-
-    #     traj_ref = PoseTrajectory3D(
-    #         positions_xyz=traj_ref[:,:3],
-    #         orientations_quat_wxyz=traj_ref[:,3:],
-    #         timestamps=timestamps)
-        
-    #     result = main_ape.ape(traj_ref, traj_est, est_name='traj', 
-    #         pose_relation=PoseRelation.translation_part, align=True, correct_scale=True)
-
-    #     return result.stats["rmse"]
 
     # print(traj_est.positions_xyz)
-    # plt.plot(traj_ref.positions_xyz[:,0], traj_ref.positions_xyz[:,1], label = "Ground Truth")
-    # # plt.plot(original_DPVO[:,2].cpu(), original_DPVO[:,0].cpu(), label = "DPVO")
-    # # plt.plot(poses[:,0].cpu(), poses[:,1].cpu(), label = "Patch Improvement")
-    # plt.plot(traj_est.positions_xyz[:,0], traj_est.positions_xyz[:,1], label = "Patch Improvement")
+    # plt.plot(gt_traj.positions_xyz[:,0], gt_traj.positions_xyz[:,1], label = "Ground Truth")
+    # plt.plot(np.array([1, 2]), np.array([1, 2]), label = "Patch Improvement")
     # plt.legend()
     # plt.show()
