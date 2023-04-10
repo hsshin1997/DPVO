@@ -162,4 +162,4 @@ datasets/TartanAir
 TartanAirResults
 thirdparty/*
 
-./result
+result/

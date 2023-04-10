@@ -317,7 +317,7 @@ def main():
                 # whether is this point flow valid (invalid if too small)
                 dist = np.sqrt( (dx-x_avg) ** 2 + (dy-y_avg) ** 2)
                 # print("dist is ", dist)
-                if dist < 8:
+                if dist < 5:
                     count_not_valid += 1
                     continue
                 else:
