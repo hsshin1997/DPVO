@@ -165,3 +165,4 @@ thirdparty/*
 result/
 *.pt
 poses.txt
+tstamps.txt
