@@ -173,9 +173,10 @@ class DPVO:
         name = "ocean_data"
         # save_trajectory_tum_format(poses, f"saved_trajectories/{name}.txt")
         # plot_trajectory(poses, title=f"DPVO Trajectory Prediction for {name}", filename=f"trajectory_plots/{name}.pdf")
-        np.savetxt('poses.txt', poses, fmt='%f')
+        np.savetxt('poses.txt', poses)
+        np.savetxt('tstamps.txt', tstamps)
 
-        print(poses)
+        print("Savev poses and tstamps to txt file")
         
         if self.viewer is not None:
             self.viewer.join()
