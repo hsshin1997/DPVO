@@ -36,10 +36,10 @@ if __name__ == '__main__':
             # print(v1, v2, v3, v4)
             draw.rectangle((v1[0], v1[1], v4[0], v4[1]), fill="red")
 
-            v1 = patch3[0, i, 0:2, 0, 0]
-            v2 = patch3[0, i, 0:2, 0, 2]
-            v3 = patch3[0, i, 0:2, 2, 0]
-            v4 = patch3[0, i, 0:2, 2, 2]
+            v1 = patch0[0, i, 0:2, 0, 0]
+            v2 = patch0[0, i, 0:2, 0, 2]
+            v3 = patch0[0, i, 0:2, 2, 0]
+            v4 = patch0[0, i, 0:2, 2, 2]
             draw.rectangle((v1[0], v1[1], v4[0], v4[1]), fill="blue")
             # print(v1, v2, v3, v4)
         # write to stdout

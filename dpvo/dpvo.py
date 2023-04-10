@@ -368,13 +368,14 @@ class DPVO:
                     fastba.BA(self.tmp_poses, self.tmp_patches, self.intrinsics,
                               target, tmp_weight, lmbda, self.ii, self.jj,
                               self.kk, t0, self.n, 2)
+                    if self.counter == 104:
+                        filename = f'{i}.pt'
+                        torch.save(self.tmp_patches, filename)
                     # compute the residual with the new poses
                     coords = self.reproject(poses=self.tmp_poses, patches=self.tmp_patches)
                     fitting_error = (coords[..., self.P // 2, self.P // 2] - target).pow(2).mean().item()
                     
-                    if self.counter == 104:
-                        filename = f'{i}.pt'
-                        torch.save(self.tmp_patches, filename)
+                    
                     print("Fitting error ", fitting_error)
                     if fitting_error < best_fit:
                         print("New best fit ", fitting_error)
@@ -384,11 +385,12 @@ class DPVO:
                 except:
                     print("Warning BA failed...")
             
-            if self.counter == 104:
-                torch.save(best_patches, "best_patches.pt")
+            
 
             self.poses_ = best_poses.view(*pose_shape)
             self.patches_ =  best_patches.view(*patch_shape)
+            if self.counter == 104:
+                torch.save(self.patches_ , "best_patches.pt")
             assert torch.sum(self.poses == self.poses_)
             points = pops.point_cloud(SE3(self.poses), self.patches[:, :self.m], self.intrinsics,
                                       self.ix[:self.m])
