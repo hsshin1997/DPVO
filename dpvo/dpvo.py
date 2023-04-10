@@ -11,6 +11,8 @@ from .net import VONet
 from .utils import *
 from . import projective_ops as pops
 
+from dpvo.plot_utils import plot_trajectory, save_trajectory_tum_format
+
 autocast = torch.cuda.amp.autocast
 Id = SE3.Identity(1, device="cuda")
 
@@ -167,8 +169,13 @@ class DPVO:
         poses = lietorch.stack(poses, dim=0)
         poses = poses.inv().data.cpu().numpy()
         tstamps = np.array(self.tlist, dtype=np.float)
-        print(poses)
 
+        name = "ocean_data"
+        save_trajectory_tum_format(poses, f"saved_trajectories/{name}.txt")
+        plot_trajectory(poses, title=f"DPVO Trajectory Prediction for {name}", filename=f"trajectory_plots/{name}.pdf")
+
+        print(poses)
+        
         if self.viewer is not None:
             self.viewer.join()
 
