@@ -389,7 +389,7 @@ class DPVO:
 
             self.poses_ = best_poses.view(*pose_shape)
             self.patches_ =  best_patches.view(*patch_shape)
-            if self.counter == 99:
+            if self.counter == 2:
                 torch.save(self.patches_ , "best_patches.pt")
             assert torch.sum(self.poses == self.poses_)
             points = pops.point_cloud(SE3(self.poses), self.patches[:, :self.m], self.intrinsics,
