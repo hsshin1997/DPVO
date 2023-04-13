@@ -2,6 +2,7 @@ import argparse
 import cv2
 import numpy as np
 from scipy.spatial.transform import Rotation
+import torch
 
 # Tartan params
 fx = 320.0  # focal length x
@@ -119,7 +120,7 @@ def plot_optical_flow(img, flow, window_name, flow_dist_thresh=2, visualizatino_
         if dist[i] > flow_dist_thresh:
             point1 = (x[i], y[i])
             point2 = (x[i] + int(fx[i]), y[i] + int(fy[i]))
-            cv2.circle(vis, point1, 3, (0, 255, 0), -1)
+            cv2.circle(vis, point1, 3, (0, 255, 0), -1) 
             cv2.circle(vis, point2, 3, (255, 0, 0), -1)
 
     cv2.polylines(vis, lines, 0, (0, 255, 0))
@@ -251,9 +252,13 @@ def plot_distribution(data, bins=50):
     plt.title('Distribution of Values')
     plt.show()
 
+def load_depth_map(dir):
+    depth_map = np.load(dir)
+    return depth_map
+
 def main():
     # the key threshold value: 5 is the best experimental value
-    epipolar_dist_thresh =  5.5 / fx
+    epipolar_dist_thresh = 5.5 / fx   # TODO
     print("epipolar_dist_thresh is ", epipolar_dist_thresh)
 
     parser = argparse.ArgumentParser(description='Filter optical flow for Tartan.')
@@ -263,6 +268,7 @@ def main():
 
     data_dir = args.data_dir
     Rs, ts = load_poses(data_dir + "pose_left.txt")
+    # print("Rs len", len(Rs), "ts len", len(ts))
 
     for i in range(1, len(Rs)):
         cur_id = number_to_frame_id(i)
@@ -287,11 +293,19 @@ def main():
         
         # gt flow
         flow = load_flow(pre_id, cur_id, data_dir)
+        # print("flow shape:", flow.shape)
 
         # calculated flow
         img1_path = data_dir + "image_left/{}_left.png".format(pre_id)
         img2_path = data_dir + "image_left/{}_left.png".format(cur_id)
-        
+
+        depth_pre = load_depth_map(data_dir + "depth_left/{}_left_depth.npy".format(pre_id))
+        depth_cur = load_depth_map(data_dir + "depth_left/{}_left_depth.npy".format(cur_id))
+        # print("depth_pre shape:", depth_pre.shape)
+        # print("depth_cur shape:", depth_cur.shape)
+
+        depth_diff_thresh = 2.0  # TODO
+
         # visualization before filtering dynamic objects
         img1 = cv2.imread(img1_path)
         flow_img_before = plot_optical_flow(img1, flow, "flow {}_{}".format(pre_id, cur_id))
@@ -301,6 +315,8 @@ def main():
         epipolar_dists = []
         filtered_flow_coordinates = []
         count_valid = 0
+        count_depth_selected = 0
+        count_epipolar_selected = 0
         count_not_valid = 0
         x = np.zeros((flow.shape[0], flow.shape[1]))
         y = np.zeros((flow.shape[0], flow.shape[1]))
@@ -310,31 +326,52 @@ def main():
                 y[row, col] = flow[row, col][1]
         x_avg = np.mean(x)
         y_avg = np.mean(y)
+        mangitude_avg = np.sqrt(x_avg ** 2 + y_avg ** 2)
 
         for row in range(0, flow.shape[0]):
             for col in range(0, flow.shape[1]):
                 dx, dy = flow[row, col]
                 # whether is this point flow valid (invalid if too small)
                 dist = np.sqrt( (dx-x_avg) ** 2 + (dy-y_avg) ** 2)
-                # print("dist is ", dist)
-                if dist < 5:
+                # print(dx, x_avg, dy, y_avg, dist, mangitude_avg)
+                if dist < 1.5 * mangitude_avg:
                     count_not_valid += 1
                     continue
                 else:
                     count_valid += 1
 
-                p_pre = np.array([col, row])
-                p_cur = np.array([col + dx, row + dy])
-                epipolar_line = compute_epipolar_line(p_pre, E, cam_intrinsic_mat)
-                p_cur_normalized = pixel_to_normalized_coord(p_cur[0], p_cur[1], fx, fy, cx, cy)
-                d = point_line_distance(p_cur_normalized, epipolar_line)
-                epipolar_dists.append(d)
-                if d > epipolar_dist_thresh:
+                # Check the difference in depth values between the corresponding points
+                depth_pre_value = depth_pre[row, col]
+                row_new = np.min((int(row + dy), 479))
+                col_new = np.min((int(col + dx), 639))
+                depth_cur_value = depth_cur[row_new, col_new]
+                depth_diff = abs(depth_pre_value - depth_cur_value)
+
+                # print("depth_diff", depth_diff)
+                if depth_diff > depth_diff_thresh:
+                    # Large depth difference, consider as dynamic object
+                    count_depth_selected += 1
                     filtered_flow_coordinates.append(np.array([row, col]))
                     flow[row, col][0] = 0
                     flow[row, col][1] = 0
+                else:
+                    p_pre = np.array([col, row])
+                    p_cur = np.array([col + dx, row + dy])
+                    epipolar_line = compute_epipolar_line(p_pre, E, cam_intrinsic_mat)
+                    p_cur_normalized = pixel_to_normalized_coord(p_cur[0], p_cur[1], fx, fy, cx, cy)
+                    d = point_line_distance(p_cur_normalized, epipolar_line)
+                    epipolar_dists.append(d)
+                    #print(d, epipolar_dist_thresh)
+                    if d > epipolar_dist_thresh:
+                        count_epipolar_selected += 1
+                        filtered_flow_coordinates.append(np.array([row, col]))
+                        flow[row, col][0] = 0
+                        flow[row, col][1] = 0
         print("count_valid: ", count_valid)
         print("count_not_valid: ", count_not_valid)
+        print("count_depth_selected: ", count_depth_selected)
+        print("count_epipolar_selected: ", count_epipolar_selected)
+        print("x = ", np.shape(flow))
         # print(epipolar_dists)
         # visualization after filtering dynamic objects
         filter_mask = np.zeros((img1.shape[0], img1.shape[1]), dtype=np.uint8)
@@ -342,13 +379,14 @@ def main():
         for coor in filtered_flow_coordinates:
             # cv2.circle(vis, (coor[1], coor[0]), 3, (0, 0, 255), -1)
             filter_mask[coor[0], coor[1]] = 255
-
+        
+        np.save('mask_index/filtered_flow_coordinates{}.npy'.format(i), filtered_flow_coordinates)
         #change blue channel 
         vis[filter_mask == 255, 0] = 255
 
 
         concatenated_image = cv2.hconcat([flow_img_before, vis])
-        cv2.imwrite("./result_2.0/{}_result.png".format(cur_id), concatenated_image)
+        cv2.imwrite("./result/{}_result.png".format(cur_id), concatenated_image)
 
 
 

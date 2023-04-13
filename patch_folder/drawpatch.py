@@ -26,7 +26,7 @@ if __name__ == '__main__':
     print(original_patch.size())
     print(best_patch[0, 0, :, 1, 1])
 
-    with Image.open("patch_folder/000099_left.png") as im:
+    with Image.open("patch_folder/000200_left.png") as im:
 
         draw = ImageDraw.Draw(im)
         for i in range(96):

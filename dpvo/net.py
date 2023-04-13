@@ -114,7 +114,7 @@ class Patchifier(nn.Module):
 
         b, n, c, h, w = fmap.shape
         P = self.patch_size
-
+        print("counter: ", self.counter)
         # bias patch selection towards regions with high gradient
         if gradient_bias:
             g = self.__image_gradient(images)
