@@ -122,7 +122,7 @@ class Patchifier(nn.Module):
         try:
             print('mask_index/filtered_flow_coordinates{}.npy'.format(counter))
             filtered_flow_coordinates = np.load('mask_index/filtered_flow_coordinates{}.npy'.format(counter))
-            if np.shape(filtered_flow_coordinates)[0] >= patches_per_image:
+            if np.shape(filtered_flow_coordinates)[0] > 0:
                 print(np.shape(filtered_flow_coordinates))
                 mask_found = True
         except FileNotFoundError:
@@ -146,6 +146,8 @@ class Patchifier(nn.Module):
         else:
             x = torch.randint(1, w-1, size=[n, patches_per_image], device="cuda")
             y = torch.randint(1, h-1, size=[n, patches_per_image], device="cuda")
+            print("x: ", x.size())
+            print("y: ", y.size())
         
         coords = torch.stack([x, y], dim=-1).float()
         imap = altcorr.patchify(imap[0], coords, 0).view(b, -1, DIM, 1, 1)
