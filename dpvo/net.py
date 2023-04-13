@@ -124,11 +124,11 @@ class Patchifier(nn.Module):
             filtered_flow_coordinates = np.load('mask_index/filtered_flow_coordinates{}.npy'.format(counter))
             if np.shape(filtered_flow_coordinates)[0] > 0:
                 print(np.shape(filtered_flow_coordinates))
+                filtered_flow_coordinates = np.floor_divide(filtered_flow_coordinates, 4)
                 mask_found = True
         except FileNotFoundError:
             print('file does not exist')
 
-        print(gradient_bias)
         # bias patch selection towards regions with high gradient
         if gradient_bias:
             
