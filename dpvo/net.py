@@ -120,8 +120,8 @@ class Patchifier(nn.Module):
 
         mask_found = False
         try:
-            print('mask_index/filter_flow_coordinates{}.npy'.format(counter))
-            filtered_flow_coordinates = np.load('mask_index/filter_flow_coordinates{}.npy'.format(counter))
+            print('mask_index/filtered_flow_coordinates{}.npy'.format(counter))
+            filtered_flow_coordinates = np.load('mask_index/filtered_flow_coordinates{}.npy'.format(counter))
             print(np.shape(filtered_flow_coordinates))
             mask_found = True
         except FileNotFoundError:
