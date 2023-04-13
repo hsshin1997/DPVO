@@ -107,15 +107,17 @@ class Patchifier(nn.Module):
         g = F.avg_pool2d(g, 4, 4)
         return g
 
-    def forward(self, images, patches_per_image=80, disps=None, gradient_bias=False, return_color=False):
+    def forward(self, images, patches_per_image=80, disps=None, gradient_bias=False, return_color=False, counter=0):
         """ extract patches from input images """
         fmap = self.fnet(images) / 4.0
         imap = self.inet(images) / 4.0
-
+        
         b, n, c, h, w = fmap.shape
         P = self.patch_size
         # print("w: ", w, "h: ", h) w = 160 h = 120
-        print("patches_per_image: ", patches_per_image)
+        # print("patches_per_image: ", patches_per_image) 96
+        print("counter: ", counter)
+
         # bias patch selection towards regions with high gradient
         if gradient_bias:
             g = self.__image_gradient(images)
@@ -180,6 +182,8 @@ class VONet(nn.Module):
 
         self.DIM = DIM
         self.RES = 4
+
+        # self.counter = 0
 
 
     @autocast(enabled=False)
