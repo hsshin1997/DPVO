@@ -117,6 +117,8 @@ class Patchifier(nn.Module):
         # print("w: ", w, "h: ", h) w = 160 h = 120
         # print("patches_per_image: ", patches_per_image) 96
         print("counter: ", counter)
+        
+        filtered_flow_coordinates = np.load('mask_index/filter_flow_coordinates{}.npy'.format(counter))
 
         # bias patch selection towards regions with high gradient
         if gradient_bias:
