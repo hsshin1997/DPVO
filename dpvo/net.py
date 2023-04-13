@@ -122,13 +122,15 @@ class Patchifier(nn.Module):
         try:
             print('mask_index/filtered_flow_coordinates{}.npy'.format(counter))
             filtered_flow_coordinates = np.load('mask_index/filtered_flow_coordinates{}.npy'.format(counter))
-            print(np.shape(filtered_flow_coordinates))
-            mask_found = True
+            if np.shape(filtered_flow_coordinates)[0] >= patches_per_image:
+                print(np.shape(filtered_flow_coordinates))
+                mask_found = True
         except FileNotFoundError:
             print('file does not exist')
 
         # bias patch selection towards regions with high gradient
         if gradient_bias:
+            print("in gradient_bias")
             g = self.__image_gradient(images)
             x = torch.randint(1, w-1, size=[n, 3*patches_per_image], device="cuda")
             y = torch.randint(1, h-1, size=[n, 3*patches_per_image], device="cuda")
