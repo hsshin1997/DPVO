@@ -159,6 +159,7 @@ class Patchifier(nn.Module):
 
                         x[n_ind, patch_ind] = x1
                         y[n_ind, patch_ind] = y1
+                print("mask found and generated new x and y")
             else:
                 x = torch.randint(1, w-1, size=[n, patches_per_image], device="cuda")
                 y = torch.randint(1, h-1, size=[n, patches_per_image], device="cuda")
