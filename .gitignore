@@ -162,7 +162,7 @@ datasets/TartanAir
 TartanAirResults
 thirdparty/*
 
-result/
+result/*
 *.pt
 poses.txt
 tstamps.txt
