@@ -170,7 +170,8 @@ class DPVO:
         
         np.savetxt('poses.txt', poses)
         np.savetxt('tstamps.txt', tstamps)
-        
+
+        print("Saved poses and tstamps")
         if self.viewer is not None:
             self.viewer.join()
 
