@@ -167,7 +167,10 @@ class DPVO:
         poses = lietorch.stack(poses, dim=0)
         poses = poses.inv().data.cpu().numpy()
         tstamps = np.array(self.tlist, dtype=np.float)
-
+        
+        np.savetxt('poses.txt', poses)
+        np.savetxt('tstamps.txt', tstamps)
+        
         if self.viewer is not None:
             self.viewer.join()
 
