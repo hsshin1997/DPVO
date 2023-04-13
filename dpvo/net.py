@@ -151,10 +151,10 @@ class Patchifier(nn.Module):
                     for patch_ind in range(patches_per_image):
                         x1 = torch.randint(1, w-1, size=[1, 1], device="cuda")
                         y1 = torch.randint(1, h-1, size=[1, 1], device="cuda")
-                        # while torch.isin(x1, filtered_flow_coordinates[:,0]): 
-                        #     x1 = torch.randint(1, w-1, size=[1, 1], device="cuda")
-                        # while torch.isin(y1, filtered_flow_coordinates[:,1]):
-                        #     y1 = torch.randint(1, h-1, size=[1, 1], device="cuda")
+                        while torch.isin(x1, filtered_flow_coordinates[:,0]): 
+                            x1 = torch.randint(1, w-1, size=[1, 1], device="cuda")
+                        while torch.isin(y1, filtered_flow_coordinates[:,1]):
+                            y1 = torch.randint(1, h-1, size=[1, 1], device="cuda")
 
                         x[n_ind, patch_ind] = x1
                         y[n_ind, patch_ind] = y1
