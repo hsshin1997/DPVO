@@ -144,9 +144,16 @@ class Patchifier(nn.Module):
             y = torch.gather(y, 1, ix[:, -patches_per_image:])
 
         else:
-            print("n: ", n)
-            x = torch.randint(1, w-1, size=[n, patches_per_image], device="cuda")
-            y = torch.randint(1, h-1, size=[n, patches_per_image], device="cuda")
+            x = torch.empty([n, patches_per_image], device="cuda")
+            y = torch.empty([n, patches_per_image], device="cuda")
+            for n_ind in range(n):
+                for patch_ind in range(patches_per_image):
+                    x1 = torch.randint(1, w-1, size=[1, 1], device="cuda")
+                    y1 = torch.randint(1, h-1, size=[1, 1], device="cuda")
+                    x[n_ind, patch_ind] = x1
+                    y[n_ind, patch_ind] = y1
+            # x = torch.randint(1, w-1, size=[n, patches_per_image], device="cuda")
+            # y = torch.randint(1, h-1, size=[n, patches_per_image], device="cuda")
             print("x: ", x.size())
             print("y: ", y.size())
         
