@@ -334,7 +334,7 @@ class DPVO:
                 self.network.patchify(image,
                     patches_per_image=self.cfg.PATCHES_PER_FRAME, 
                     gradient_bias=self.cfg.GRADIENT_BIAS, 
-                    return_color=True)
+                    return_color=True, counter = self.counter)
 
         ### update state attributes ###
         self.tlist.append(tstamp)
