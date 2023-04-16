@@ -144,34 +144,34 @@ class Patchifier(nn.Module):
             y = torch.gather(y, 1, ix[:, -patches_per_image:])
 
         else:
-            if mask_found:
-                x = torch.empty([n, patches_per_image], device="cuda")
-                y = torch.empty([n, patches_per_image], device="cuda")
-                for n_ind in range(n):
-                    for patch_ind in range(patches_per_image):
-                        x1 = torch.randint(1, w-1, size=[1, 1], device="cuda")
-                        y1 = torch.randint(1, h-1, size=[1, 1], device="cuda")
-                        if x1 in filtered_flow_coordinates[:,0]:
-                            idx = (filtered_flow_coordinates[:,0] == x).nonzero().flatten()
+            # if mask_found:
+            #     x = torch.empty([n, patches_per_image], device="cuda")
+            #     y = torch.empty([n, patches_per_image], device="cuda")
+            #     for n_ind in range(n):
+            #         for patch_ind in range(patches_per_image):
+            #             x1 = torch.randint(1, w-1, size=[1, 1], device="cuda")
+            #             y1 = torch.randint(1, h-1, size=[1, 1], device="cuda")
+            #             if x1 in filtered_flow_coordinates[:,0]:
+            #                 idx = (filtered_flow_coordinates[:,0] == x).nonzero().flatten()
                             
-                            while not y1 in filtered_flow_coordinates[idx, 1]:
-                                y1 = torch.randint(1, h-1, size=[1, 1], device="cuda")
+            #                 while not y1 in filtered_flow_coordinates[idx, 1]:
+            #                     y1 = torch.randint(1, h-1, size=[1, 1], device="cuda")
 
-                        x[n_ind, patch_ind] = x1
-                        y[n_ind, patch_ind] = y1
-                print("mask found and generated new x and y")
-            else:
-                x = torch.randint(1, w-1, size=[n, patches_per_image], device="cuda")
-                y = torch.randint(1, h-1, size=[n, patches_per_image], device="cuda")
-            print("x: ", x.size())
-            print("y: ", y.size())
+            #             x[n_ind, patch_ind] = x1
+            #             y[n_ind, patch_ind] = y1
+            #     print("mask found and generated new x and y")
+            # else:
+            #     x = torch.randint(1, w-1, size=[n, patches_per_image], device="cuda")
+            #     y = torch.randint(1, h-1, size=[n, patches_per_image], device="cuda")
+            # print("x: ", x.size())
+            # print("y: ", y.size())
+
+            x = torch.randint(1, w-1, size=[n, patches_per_image], device="cuda")
+            y = torch.randint(1, h-1, size=[n, patches_per_image], device="cuda")
         
         coords = torch.stack([x, y], dim=-1).float()
         imap = altcorr.patchify(imap[0], coords, 0).view(b, -1, DIM, 1, 1)
         gmap = altcorr.patchify(fmap[0], coords, P//2).view(b, -1, 128, P, P)
-
-        if counter == 105:
-            torch.save(coords, "coords.pt")
 
         if return_color:
             clr = altcorr.patchify(images[0], 4*(coords + 0.5), 0).view(b, -1, 3)
