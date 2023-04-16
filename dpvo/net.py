@@ -170,6 +170,9 @@ class Patchifier(nn.Module):
         imap = altcorr.patchify(imap[0], coords, 0).view(b, -1, DIM, 1, 1)
         gmap = altcorr.patchify(fmap[0], coords, P//2).view(b, -1, 128, P, P)
 
+        if self.counter == 105:
+            torch.save(coords, "coords.pt")
+
         if return_color:
             clr = altcorr.patchify(images[0], 4*(coords + 0.5), 0).view(b, -1, 3)
 

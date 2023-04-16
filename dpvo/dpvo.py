@@ -299,7 +299,7 @@ class DPVO:
             points = (points[...,1,1,:3] / points[...,1,1,3:]).reshape(-1, 3)
             self.points_[:len(points)] = points[:]
         
-        if self.counter == 97:
+        if self.counter == 105:
             torch.save(self.patches.view(self.patches_.shape), "original_patches.pt")
                 
     def __edges_all(self):
