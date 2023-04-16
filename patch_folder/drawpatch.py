@@ -21,7 +21,7 @@ if __name__ == '__main__':
     # patch4 = torch.load('patch_folder/4.pt')
     original_patch = torch.load('patch_folder/original_patches.pt')
 
-    best_patch = torch.load('patch_folder/best_patches.pt')
+    best_patch = torch.load('patch_folder/test_patches.pt')
 
     print(original_patch.size())
     print(best_patch[0, 0, :, 1, 1])
