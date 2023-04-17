@@ -4,7 +4,7 @@ import glob
 import os.path as osp
 import os
 import torch
-import timeit
+import time
 from pathlib import Path
 from multiprocessing import Process, Queue
 from plyfile import PlyElement, PlyData
@@ -27,7 +27,7 @@ def show_image(image, t=0):
 @torch.no_grad()
 def run(cfg, network, imagedir, calib, stride=1, skip=0, viz=False, timeit=False, save_reconstruction=False):
 
-    t_0 = timeit.default_timer()
+    start = time.perf_counter()
     slam = None
     queue = Queue(maxsize=8)
 
@@ -67,9 +67,9 @@ def run(cfg, network, imagedir, calib, stride=1, skip=0, viz=False, timeit=False
         el = PlyElement.describe(points, 'vertex',{'some_property': 'f8'},{'some_property': 'u4'})
         return slam.terminate(), PlyData([el], text=True)
     
-    t_1 = timeit.default_timer()
-    elapsed_time = round((t_1 - t_0) * 10 ** 6, 3)
-    print(f"Elapsed time: {elapsed_time} µs")
+    end = time.perf_counter()
+    ms = (end-start) * 10**6
+    print(f"Elapsed {ms:.03f} micro secs.")
     print("Terminating")
     print(slam.counter)
     # np.savetxt('pose.txt', slam.poses_.numpy())
