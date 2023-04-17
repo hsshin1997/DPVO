@@ -4,6 +4,7 @@ import glob
 import os.path as osp
 import os
 import torch
+import timeit
 from pathlib import Path
 from multiprocessing import Process, Queue
 from plyfile import PlyElement, PlyData
@@ -14,7 +15,8 @@ from dpvo.config import cfg
 from dpvo.stream import image_stream, video_stream
 from dpvo.plot_utils import plot_trajectory, save_trajectory_tum_format
 
-import timeit
+
+
 SKIP = 0
 
 def show_image(image, t=0):
@@ -64,6 +66,7 @@ def run(cfg, network, imagedir, calib, stride=1, skip=0, viz=False, timeit=False
                           dtype=[('x', '<f4'), ('y', '<f4'), ('z', '<f4'),('red', 'u1'), ('green', 'u1'),('blue', 'u1')])
         el = PlyElement.describe(points, 'vertex',{'some_property': 'f8'},{'some_property': 'u4'})
         return slam.terminate(), PlyData([el], text=True)
+    
     t_1 = timeit.default_timer()
     elapsed_time = round((t_1 - t_0) * 10 ** 6, 3)
     print(f"Elapsed time: {elapsed_time} µs")
