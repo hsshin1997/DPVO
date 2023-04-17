@@ -48,7 +48,7 @@ def ate(traj_ref, traj_est, timestamps):
         timestamps=timestamps)
     
     result = main_ape.ape(traj_ref, traj_est, est_name='traj', 
-        pose_relation=PoseRelation.translation_part, align=True, correct_scale=True)
+        pose_relation=PoseRelation.translation_part, align=True, correct_scale=True, align_origin=True)
 
     return result.stats["rmse"]
 
@@ -62,8 +62,8 @@ if __name__ == '__main__':
     traj_ref = np.loadtxt(traj_ref, delimiter=" ")
 
     # load DPVO (estimate) trajectory 
-    traj_est= np.loadtxt('poses.txt', dtype=np.float64)
-    tstamps = np.loadtxt('tstamps.txt', dtype=np.float64)
+    traj_est= np.loadtxt('ransac_results/DPVO/poses9.txt', dtype=np.float64)
+    tstamps = np.loadtxt('ransac_results/DPVO/tstamps9.txt', dtype=np.float64)
 
     # do evaluation
     ate_score = ate(traj_ref, traj_est, tstamps)
@@ -93,8 +93,8 @@ if __name__ == '__main__':
     
     # np.savetxt('x_gt.txt', x_gt)
     # np.savetxt('y_gt.txt', y_gt)
-    np.savetxt('x_pred_ransac10.txt', x_pred)
-    np.savetxt('y_pred_ransac10.txt', y_pred)
+    np.savetxt('x_pred_of10.txt', x_pred)
+    np.savetxt('y_pred_of10.txt', y_pred)
 
 
     # print(traj_est.positions_xyz)
