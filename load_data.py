@@ -93,8 +93,8 @@ if __name__ == '__main__':
     
     # np.savetxt('x_gt.txt', x_gt)
     # np.savetxt('y_gt.txt', y_gt)
-    np.savetxt('x_pred.txt', x_pred)
-    np.savetxt('y_pred.txt', y_pred)
+    np.savetxt('x_pred_ransac10.txt', x_pred)
+    np.savetxt('y_pred_ransac10.txt', y_pred)
 
 
     # print(traj_est.positions_xyz)

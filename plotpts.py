@@ -22,7 +22,7 @@ traj_ref = np.loadtxt(traj_ref, delimiter=" ")
 
 plt.plot(traj_ref[:,0], traj_ref[:,1], label = "Ground Truth")
 plt.plot(x_dpvo, y_dpvo, label = "DPVO")
-plt.plot(x_ransac1, y_ransac1, label = "Patch Improvement 1")
+plt.plot(x_ransac1, y_ransac1, label = "RANSAC")
 plt.plot(x_of, y_of, label = "Optical flow")
 plt.legend()
 plt.show()
